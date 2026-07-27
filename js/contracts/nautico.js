@@ -6,8 +6,47 @@
 
 window.VenturaContracts = window.VenturaContracts || {};
 
+function parseBoletoLinesPDF(parcelamentoText) {
+  if (!parcelamentoText || !parcelamentoText.trim()) return [];
+  const lines = parcelamentoText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length === 1) {
+    return [{
+      text: `Parcelamento boleto: ${lines[0]}`,
+      size: 10,
+      spaceAfter: 2
+    }];
+  }
+  
+  const blocks = [
+    {
+      text: 'Parcelamento boleto (fábrica):',
+      bold: true,
+      size: 10,
+      spaceAfter: 2
+    }
+  ];
+  
+  lines.forEach(line => {
+    blocks.push({
+      text: `   • ${line}`,
+      size: 9.5,
+      spaceAfter: 1.5
+    });
+  });
+  
+  return blocks;
+}
+
 window.VenturaContracts.nautico = function(data) {
-  return [
+  // Construção do bloco do comprador sem repetições
+  let compradorText = `COMPRADOR(A): ${data.nome || '_______________'}, inscrito(a) no CPF/CNPJ sob o nº ${data.cpf || '_______________'}`;
+  if (data.rg) compradorText += `, RG ${data.rg}`;
+  if (data.endereco) compradorText += `, residente e domiciliado(a) à ${data.endereco}`;
+  if (data.telefone) compradorText += `, telefone ${data.telefone}`;
+  if (data.email) compradorText += `, e-mail ${data.email}`;
+  compradorText += `, doravante denominado(a) COMPRADOR(A).`;
+
+  const blocks = [
     // --- TÍTULO ---
     {
       text: 'CONTRATO DE COMPRA E VENDA DE EMBARCAÇÃO NÁUTICA',
@@ -24,7 +63,7 @@ window.VenturaContracts.nautico = function(data) {
     },
     // --- COMPRADOR ---
     {
-      text: `COMPRADOR(A): ${data.nome || '_______________'}, inscrito(a) no CPF sob o nº ${data.cpf || '_______________'}, RG ${data.rg || '_______________'}, residente e domiciliado à ${data.endereco || '_______________'}, telefone para contato ${data.telefone || '_______________'}, e-mail ${data.email || '_______________'}, doravante denominado(a) COMPRADOR(A).`,
+      text: compradorText,
       size: 10,
       spaceAfter: 6
     },
@@ -68,41 +107,37 @@ window.VenturaContracts.nautico = function(data) {
       size: 10,
       spaceAfter: 3
     },
-    {
-      text: `Sinal: R$ ${data.valorSinal || '_______________'}`,
+    ...(data.valorSinal ? [{
+      text: `Sinal: R$ ${data.valorSinal}`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Entrada: R$ ${data.valorEntrada || '_______________'}`,
+      spaceAfter: 2
+    }] : []),
+    ...(data.valorEntrada ? [{
+      text: `Entrada: R$ ${data.valorEntrada}`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Permuta: ${data.permuta || '_______________'}, com todas as manutenções em dia e em bom estado de conservação.`,
+      spaceAfter: 2
+    }] : []),
+    ...(data.permuta ? [{
+      text: `Permuta: ${data.permuta}, com todas as manutenções em dia e em bom estado de conservação.`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Contra embarque: R$ ${data.contraEmbarque || '_______________'}`,
+      spaceAfter: 2
+    }] : []),
+    ...(data.contraEmbarque ? [{
+      text: `Contra embarque: R$ ${data.contraEmbarque}`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Parcelamento boleto: R$ ${data.parcelamentoFabrica || '_______________'}`,
+      spaceAfter: 2
+    }] : []),
+    ...(data.parcelamentoFabrica ? parseBoletoLinesPDF(data.parcelamentoFabrica) : []),
+    ...(data.parcelamentoBancario ? [{
+      text: `Parcelamento bancário/cartão de crédito: ${data.parcelamentoBancario}`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Parcelamento bancário/cartão de crédito: ${data.parcelamentoBancario || '_______________'}`,
-      size: 10,
-      spaceAfter: 5
-    },
-    {
+      spaceAfter: 4
+    }] : []),
+    ...(data.permuta ? [{
       text: '2.1. Em caso de troca ou permuta, o bem ficará em poder da VENDEDORA, a título de garantia real, até sua venda a terceiro adquirente. O valor da venda será utilizado para abatimento parcial do preço deste contrato.',
       size: 10,
       spaceAfter: 5
-    },
+    }] : []),
     // --- DADOS BANCÁRIOS ---
     {
       text: 'Dados para depósito:',
@@ -111,130 +146,95 @@ window.VenturaContracts.nautico = function(data) {
       spaceAfter: 2
     },
     {
-      text: 'Comfort Ind. Com. Ltda – CNPJ: 10.215.056/0001-17',
-      size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: 'Banco Santander – 033',
-      size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: 'Agência: 0288',
-      size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: 'Conta Corrente 13008585-0',
-      size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: 'PIX (37) 98825-8793',
-      size: 10,
-      spaceAfter: 8
+      text: 'Banco Santander (033) | Agência: 0288 | Conta Corrente: 13.008.585-0\nFavorecido: Comfort Ind. Com. Ltda | CHAVE PIX (Celular): (37) 98825-8793',
+      size: 9.5,
+      bold: true,
+      spaceAfter: 6
     },
     // --- PRAZO DE ENTREGA ---
     {
-      text: 'DO PRAZO DE ENTREGA DO PRODUTO, PELA VENDEDORA',
+      text: 'DO PRAZO E LOCAL DE ENTREGA:',
       bold: true,
       size: 10,
       spaceAfter: 3
     },
     {
-      text: `A VENDEDORA terá um prazo de entrega da embarcação de ${data.prazoEntrega || '_______________'} úteis, contados a partir da assinatura do contrato e do pagamento da entrada, na cidade de ${data.cidadeEntrega || '_______________'}. As despesas de frete serão de responsabilidade do(a) ${data.responsavelFrete || '_______________'}.`,
+      text: `O prazo estimado para entrega do bem é de ${data.prazoEntrega || '______'} dias úteis, contados a partir da aprovação e liquidação do sinal/entrada, a ser entregue na cidade de ${data.cidadeEntrega || '_______________'}. Responsável pelo frete: ${data.responsavelFrete || 'VENDEDORA'}.`,
+      size: 10,
+      spaceAfter: 6
+    },
+    // --- CLÁUSULAS GERAIS ---
+    {
+      text: 'CLÁUSULAS GERAIS E DISPOSIÇÕES FINAIS:',
+      bold: true,
+      size: 10,
+      spaceAfter: 3
+    },
+    {
+      text: '1. O descumprimento de qualquer das obrigações assumidas pelas partes sujeitará o infrator a multa compensatória de 10% (dez por cento) sobre o valor total do contrato, além de perdas e danos apurados.',
+      size: 9.5,
+      spaceAfter: 3
+    },
+    {
+      text: '2. O sinal pago pelo COMPRADOR(A) possui caráter confirmatório da negociação, nos termos dos arts. 417 a 420 do Código Civil Brasileiro.',
+      size: 9.5,
+      spaceAfter: 3
+    },
+    {
+      text: '3. A propriedade do bem objeto deste contrato somente será transferida definitivamente ao COMPRADOR(A) após a quitação integral do preço ajustado.',
+      size: 9.5,
+      spaceAfter: 3
+    },
+    {
+      text: '4. Para dirimir quaisquer controvérsias oriundas deste instrumento, as partes elegem o foro da Comarca de Piumhi/MG, com renúncia expressa a qualquer outro, por mais privilegiado que seja.',
+      size: 9.5,
+      spaceAfter: 12
+    },
+    // --- ASSINATURAS ---
+    {
+      text: `Capitólio/MG, ${data.dataContrato || '______ de _____________ de ________.'}`,
+      align: 'center',
+      size: 10,
+      spaceAfter: 30
+    },
+    {
+      text: '________________________________________          ________________________________________',
+      align: 'center',
       size: 10,
       spaceAfter: 4
     },
     {
-      text: 'A entrega é realizada na sede da VENDEDORA, localizada na Estrada do Morro Preto, S/N – KM 01 – Zona Rural, Capitólio/MG – CEP 37.930-000. Fica estabelecido que todas as despesas e responsabilidades relativas ao transporte da embarcação até o domicílio do COMPRADOR, ou para outro local por ele indicado, serão integralmente de sua responsabilidade.',
-      size: 10,
-      spaceAfter: 8
-    },
-    // --- OBSERVAÇÕES GERAIS ---
-    {
-      text: 'DAS OBSERVAÇÕES GERAIS:',
+      text: 'COMFORT IND E COMÉRCIO LTDA                              COMPRADOR(A)',
+      align: 'center',
       bold: true,
-      size: 10,
-      spaceAfter: 3
+      size: 9.5,
+      spaceAfter: 2
     },
     {
-      text: 'Do pagamento do sinal - O COMPRADOR(A) deverá efetuar o pagamento de um sinal, no ato da assinatura deste contrato, como forma de garantir o pedido e assegurar além da data de entrega as condições especiais acordadas.',
-      size: 10,
-      spaceAfter: 3
-    },
-    {
-      text: 'Do financiamento - O COMPRADOR(A) que optar por financiamento bancário estará sujeito à aprovação de crédito pela instituição financeira após o envio da documentação solicitada.',
-      size: 10,
-      spaceAfter: 3
-    },
-    {
-      text: 'Da documentação e impostos – O COMPRADOR(A) é responsável pela documentação e diferenças de impostos entre estados caso haja.',
-      size: 10,
-      spaceAfter: 8
-    },
-    // --- FORO ---
-    {
-      text: 'DO FORO',
-      bold: true,
-      size: 10,
-      spaceAfter: 3
-    },
-    {
-      text: 'Para dirimir quaisquer controvérsias oriundas do presente contrato, as partes elegem o foro da comarca de Piumhi-MG, com exclusão de qualquer outro, por mais privilegiado que seja.',
-      size: 10,
-      spaceAfter: 12
-    },
-    // --- DATA E ASSINATURAS ---
-    {
-      text: `Capitólio, ${data.dataContrato || '______ de _____________ de ________'}`,
-      size: 10,
-      spaceAfter: 20
-    },
-    {
-      text: '___________________________________________________________________',
-      size: 10,
+      text: 'VENDEDORA',
       align: 'center',
-      spaceAfter: 1
-    },
-    {
-      text: 'VENDEDOR: COMFORT IND E COMÉRCIO LTDA',
-      size: 10,
-      align: 'center',
-      spaceAfter: 1
-    },
-    {
-      text: 'CNPJ: 10.215.056/0001-17',
-      size: 10,
-      align: 'center',
+      size: 8.5,
       spaceAfter: 15
-    },
-    {
-      text: '___________________________________________________________________',
-      size: 10,
-      align: 'center',
-      spaceAfter: 1
-    },
-    {
-      text: `COMPRADOR(A): ${data.nome || '_______________'}`,
-      size: 10,
-      align: 'center',
-      spaceAfter: 1
-    },
-    {
-      text: `CPF: ${data.cpf || '_______________'}`,
-      size: 10,
-      align: 'center',
-      spaceAfter: 0
     }
   ];
+
+  return blocks;
 };
 
 /**
  * Gera o texto de preview (HTML) do contrato Náutico
  */
 window.VenturaContracts.nauticoPreview = function(data) {
+  let boletoPreviewHtml = '';
+  if (data.parcelamentoFabrica) {
+    const lines = data.parcelamentoFabrica.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length > 1) {
+      boletoPreviewHtml = lines.map(l => `<div style="padding-left:12px; font-size:0.9rem;">• ${l}</div>`).join('');
+    } else {
+      boletoPreviewHtml = `R$ ${lines[0]}`;
+    }
+  }
+
   return `
     <h3>CONTRATO DE COMPRA E VENDA DE EMBARCAÇÃO NÁUTICA</h3>
     <div class="contract-section">
@@ -246,11 +246,11 @@ window.VenturaContracts.nauticoPreview = function(data) {
     <div class="contract-section">
       <p class="clause-title">COMPRADOR(A)</p>
       <p><span class="contract-label">Nome:</span> <span class="contract-value">${data.nome || '—'}</span></p>
-      <p><span class="contract-label">CPF:</span> <span class="contract-value">${data.cpf || '—'}</span></p>
-      <p><span class="contract-label">RG:</span> <span class="contract-value">${data.rg || '—'}</span></p>
-      <p><span class="contract-label">Endereço:</span> <span class="contract-value">${data.endereco || '—'}</span></p>
-      <p><span class="contract-label">Telefone:</span> <span class="contract-value">${data.telefone || '—'}</span></p>
-      <p><span class="contract-label">E-mail:</span> <span class="contract-value">${data.email || '—'}</span></p>
+      <p><span class="contract-label">CPF / CNPJ:</span> <span class="contract-value">${data.cpf || '—'}</span></p>
+      ${data.rg ? `<p><span class="contract-label">RG:</span> <span class="contract-value">${data.rg}</span></p>` : ''}
+      ${data.endereco ? `<p><span class="contract-label">Endereço:</span> <span class="contract-value">${data.endereco}</span></p>` : ''}
+      ${data.telefone ? `<p><span class="contract-label">Telefone:</span> <span class="contract-value">${data.telefone}</span></p>` : ''}
+      ${data.email ? `<p><span class="contract-label">E-mail:</span> <span class="contract-value">${data.email}</span></p>` : ''}
     </div>
     <div class="contract-section">
       <p class="clause-title">DO OBJETO DO CONTRATO</p>
@@ -264,12 +264,12 @@ window.VenturaContracts.nauticoPreview = function(data) {
     <div class="contract-section">
       <p class="clause-title">DO PREÇO E CONDIÇÕES DE PAGAMENTO</p>
       <p><span class="contract-label">Valor total:</span> <span class="contract-value">R$ ${data.valorTotal || '—'}</span></p>
-      <p><span class="contract-label">Sinal:</span> <span class="contract-value">R$ ${data.valorSinal || '—'}</span></p>
-      <p><span class="contract-label">Entrada:</span> <span class="contract-value">R$ ${data.valorEntrada || '—'}</span></p>
-      <p><span class="contract-label">Permuta:</span> <span class="contract-value">${data.permuta || '—'}</span></p>
-      <p><span class="contract-label">Contra embarque:</span> <span class="contract-value">R$ ${data.contraEmbarque || '—'}</span></p>
-      <p><span class="contract-label">Parc. boleto:</span> <span class="contract-value">R$ ${data.parcelamentoFabrica || '—'}</span></p>
-      <p><span class="contract-label">Parc. bancário/cartão:</span> <span class="contract-value">${data.parcelamentoBancario || '—'}</span></p>
+      ${data.valorSinal ? `<p><span class="contract-label">Sinal:</span> <span class="contract-value">R$ ${data.valorSinal}</span></p>` : ''}
+      ${data.valorEntrada ? `<p><span class="contract-label">Entrada:</span> <span class="contract-value">R$ ${data.valorEntrada}</span></p>` : ''}
+      ${data.permuta ? `<p><span class="contract-label">Permuta:</span> <span class="contract-value">${data.permuta}</span></p>` : ''}
+      ${data.contraEmbarque ? `<p><span class="contract-label">Contra embarque:</span> <span class="contract-value">R$ ${data.contraEmbarque}</span></p>` : ''}
+      ${data.parcelamentoFabrica ? `<p><span class="contract-label">Parc. boleto:</span> <span class="contract-value">${boletoPreviewHtml}</span></p>` : ''}
+      ${data.parcelamentoBancario ? `<p><span class="contract-label">Parc. bancário/cartão:</span> <span class="contract-value">${data.parcelamentoBancario}</span></p>` : ''}
     </div>
     <div class="contract-section">
       <p class="clause-title">Dados para depósito</p>

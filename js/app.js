@@ -350,10 +350,14 @@
         setVal('naut-valor-total', 'R$ 290.000,00');
         setVal('naut-sinal', 'R$ 30.000,00');
         setVal('naut-entrada', 'R$ 60.000,00');
-        setVal('naut-permuta', 'Lancha V195 ano 2021 com motor 115HP (Avaliada em R$ 80.000,00)');
-        setVal('naut-contra-embarque', 'R$ 120.000,00');
-        setVal('naut-parc-fabrica', 'R$ 10.000,00 em 12x via boleto');
-        setVal('naut-parc-bancario', 'Sem parcelamento bancário');
+        setVal('naut-permuta', '');
+        setVal('naut-contra-embarque', 'R$ 130.000,00');
+        setVal('naut-gen-valor', 'R$ 10.000,00');
+        setVal('naut-gen-dia', '25');
+        setVal('naut-gen-inicio', '08/2026');
+        setVal('naut-gen-fim', '02/2027');
+        generateBoletoSchedule('nautico');
+        setVal('naut-parc-bancario', '');
         setVal('naut-prazo', '30 dias úteis');
         setVal('naut-cidade-entrega', 'Capitólio/MG');
         setVal('naut-responsavel', 'VENDEDORA');
@@ -477,6 +481,68 @@
     } catch (e) {
       console.error('Erro ao limpar formulário:', e);
     }
+  // ---- Gerador Automático de Parcelas de Boleto ----
+  function generateBoletoSchedule(category) {
+    try {
+      const prefix = category === 'atv' ? 'atv' : 'naut';
+      const valor = val(prefix + '-gen-valor');
+      const dia = val(prefix + '-gen-dia') || '25';
+      const inicio = val(prefix + '-gen-inicio') || '08/2026';
+      const fim = val(prefix + '-gen-fim') || '02/2027';
+
+      if (!valor) {
+        showToast('⚠️ Por favor, informe o valor mensal da parcela.', 'error');
+        alert('Informe o valor mensal da parcela para gerar os vencimentos.');
+        return;
+      }
+
+      const startParts = inicio.split('/');
+      const endParts = fim.split('/');
+
+      if (startParts.length < 2 || endParts.length < 2) {
+        showToast('⚠️ Formato de mês/ano inválido. Use MM/AAAA (ex: 08/2026).', 'error');
+        alert('Formato de mês/ano inválido. Use o formato MM/AAAA (ex: 08/2026 e 02/2027).');
+        return;
+      }
+
+      let mStart = parseInt(startParts[0], 10);
+      let yStart = parseInt(startParts[1], 10);
+      let mEnd = parseInt(endParts[0], 10);
+      let yEnd = parseInt(endParts[1], 10);
+
+      const diaNum = String(parseInt(dia, 10) || 25).padStart(2, '0');
+
+      let currentMonth = mStart;
+      let currentYear = yStart;
+      let count = 1;
+      let lines = [];
+
+      while (true) {
+        let mStr = String(currentMonth).padStart(2, '0');
+        let dateStr = `${diaNum}/${mStr}/${currentYear}`;
+        lines.push(`${count}ª Parcela: ${valor} — Vencimento: ${dateStr}`);
+
+        if (currentMonth === mEnd && currentYear === yEnd) {
+          break;
+        }
+
+        count++;
+        currentMonth++;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
+        }
+
+        if (count > 60) break;
+      }
+
+      const resultText = lines.join('\n');
+      setVal(prefix + '-parc-fabrica', resultText);
+      showToast(`⚡ ${count} parcelas de boleto geradas com sucesso!`, 'success');
+    } catch (e) {
+      console.error('Erro ao gerar parcelas de boleto:', e);
+      alert('Erro ao gerar parcelas: ' + e.message);
+    }
   }
 
   // ---- Toast ----
@@ -502,7 +568,8 @@
     clear: clearForm,
     preview: showPreview,
     closePreview: hidePreview,
-    generate: generatePDF
+    generate: generatePDF,
+    generateBoletoSchedule: generateBoletoSchedule
   };
 
   // ---- Iniciar quando DOM estiver pronto ----

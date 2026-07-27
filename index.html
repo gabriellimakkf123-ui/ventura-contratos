@@ -365,9 +365,37 @@
             <label for="naut-contra-embarque">Contra embarque</label>
             <input type="text" id="naut-contra-embarque" data-mask="moeda" placeholder="R$ 0,00">
           </div>
-          <div class="form-group">
+          <!-- Gerador Automático de Parcelas de Boleto -->
+          <div class="form-group full-width" style="background: rgba(212, 168, 83, 0.06); border: 1px dashed rgba(212, 168, 83, 0.35); padding: 16px; border-radius: var(--radius-md); margin-top: 6px;">
+            <label style="color: var(--color-accent-light); font-weight: 600; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+              <span>⚡ Gerador Automático de Parcelas de Boleto por Data</span>
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;">
+              <div>
+                <label style="font-size: 0.78rem;">Valor mensal (R$)</label>
+                <input type="text" id="naut-gen-valor" data-mask="moeda" placeholder="R$ 10.000,00" style="padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+              <div>
+                <label style="font-size: 0.78rem;">Dia do Vencimento</label>
+                <input type="number" id="naut-gen-dia" min="1" max="31" value="25" style="padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+              <div>
+                <label style="font-size: 0.78rem;">1º Mês (MM/AAAA)</label>
+                <input type="text" id="naut-gen-inicio" placeholder="08/2026" style="padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+              <div>
+                <label style="font-size: 0.78rem;">Último Mês (MM/AAAA)</label>
+                <input type="text" id="naut-gen-fim" placeholder="02/2027" style="padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="VenturaApp.generateBoletoSchedule('nautico')" style="margin-top: 12px; width: 100%; border-color: var(--color-accent); color: var(--color-accent-light); padding: 8px; font-size: 0.85rem;">
+              <span>⚡ Gerar e Preencher Lista de Boleto no Contrato</span>
+            </button>
+          </div>
+
+          <div class="form-group full-width">
             <label for="naut-parc-fabrica">Parcelamento boleto (fábrica)</label>
-            <input type="text" id="naut-parc-fabrica" placeholder="Ex: R$ 5.000 em 12x">
+            <textarea id="naut-parc-fabrica" rows="4" placeholder="Use o gerador acima ou digite as condições de parcelamento por boleto..."></textarea>
           </div>
           <div class="form-group full-width">
             <label for="naut-parc-bancario">Parcelamento bancário / cartão de crédito</label>

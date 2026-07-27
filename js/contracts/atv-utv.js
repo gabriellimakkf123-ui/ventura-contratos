@@ -135,12 +135,12 @@ window.VenturaContracts.atvUtv = function(data) {
       size: 10,
       spaceAfter: 1
     },
-    {
-      text: `Observação: Veículo ${data.origem === 'SHOWROOM' ? 'disponível no SHOWROOM' : 'vindo de FÁBRICA'}`,
+    ...(data.origem === 'SHOWROOM' ? [{
+      text: 'Observação: Veículo disponível no SHOWROOM',
       size: 10,
       bold: true,
       spaceAfter: 1
-    },
+    }] : []),
     {
       text: `Itens inclusos: ${data.itensInclusos || 'TODOS OS ITENS DE SÉRIE'}`,
       size: 10,
@@ -170,16 +170,16 @@ window.VenturaContracts.atvUtv = function(data) {
       size: 10,
       spaceAfter: 3
     },
-    {
-      text: `Sinal / Entrada: ${data.sinalEntrada || 'R$ _______________'}`,
+    ...(data.sinalEntrada ? [{
+      text: `• Sinal / Entrada: ${data.sinalEntrada}`,
       size: 10,
-      spaceAfter: 1
-    },
-    {
-      text: `Saldo restante: ${data.saldoRestante || '_______________'}`,
+      spaceAfter: 2
+    }] : []),
+    ...(data.saldoRestante ? [{
+      text: `• Saldo restante: ${data.saldoRestante}`,
       size: 10,
-      spaceAfter: 8
-    },
+      spaceAfter: 2
+    }] : []),
     // --- CLÁUSULA 4 ---
     {
       text: 'CLÁUSULA 4ª – DO SINAL',
