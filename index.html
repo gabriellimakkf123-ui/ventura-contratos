@@ -246,16 +246,16 @@
 
       <!-- Ações -->
       <div class="actions">
-        <button type="button" class="btn btn-secondary" id="btnQuickFillAtv" onclick="VenturaApp.quickFill('atv')" style="border-color: var(--color-accent); color: var(--color-accent-light);">
+        <button type="button" class="btn btn-secondary" id="btnQuickFillAtv" onclick="quickFill('atv')" style="border-color: var(--color-accent); color: var(--color-accent-light);">
           <span class="btn-icon">⚡</span> Preencher Exemplo
         </button>
-        <button type="button" class="btn btn-secondary" id="btnClearAtv" onclick="VenturaApp.clear('formAtv')">
+        <button type="button" class="btn btn-secondary" id="btnClearAtv" onclick="clearForm('formAtv')">
           <span class="btn-icon">🧹</span> Limpar
         </button>
-        <button type="button" class="btn btn-secondary" id="btnPreviewAtv" onclick="VenturaApp.preview('atv')">
+        <button type="button" class="btn btn-secondary" id="btnPreviewAtv" onclick="showPreview('atv')">
           <span class="btn-icon">👁️</span> Pré-visualizar
         </button>
-        <button type="button" class="btn btn-primary" id="btnGenerateAtv" onclick="VenturaApp.generate('atv')">
+        <button type="button" class="btn btn-primary" id="btnGenerateAtv" onclick="generatePDF('atv')">
           <span class="btn-icon">📄</span> Gerar Contrato PDF
         </button>
       </div>
@@ -457,16 +457,16 @@
 
       <!-- Ações -->
       <div class="actions">
-        <button type="button" class="btn btn-secondary" id="btnQuickFillNautico" onclick="VenturaApp.quickFill('nautico')" style="border-color: var(--color-nautico); color: #93C5FD;">
+        <button type="button" class="btn btn-secondary" id="btnQuickFillNautico" onclick="quickFill('nautico')" style="border-color: var(--color-nautico); color: #93C5FD;">
           <span class="btn-icon">⚡</span> Preencher Exemplo
         </button>
-        <button type="button" class="btn btn-secondary" id="btnClearNautico" onclick="VenturaApp.clear('formNautico')">
+        <button type="button" class="btn btn-secondary" id="btnClearNautico" onclick="clearForm('formNautico')">
           <span class="btn-icon">🧹</span> Limpar
         </button>
-        <button type="button" class="btn btn-secondary" id="btnPreviewNautico" onclick="VenturaApp.preview('nautico')">
+        <button type="button" class="btn btn-secondary" id="btnPreviewNautico" onclick="showPreview('nautico')">
           <span class="btn-icon">👁️</span> Pré-visualizar
         </button>
-        <button type="button" class="btn btn-primary" id="btnGenerateNautico" onclick="VenturaApp.generate('nautico')">
+        <button type="button" class="btn btn-primary" id="btnGenerateNautico" onclick="generatePDF('nautico')">
           <span class="btn-icon">📄</span> Gerar Contrato PDF
         </button>
       </div>
@@ -496,11 +496,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=2.0.1"></script>
-<script src="js/contracts/atv-utv.js?v=2.0.1"></script>
-<script src="js/contracts/nautico.js?v=2.0.1"></script>
-<script src="js/pdf-generator.js?v=2.0.1"></script>
-<script src="js/app.js?v=2.0.1"></script>
+<script src="assets/logos.js?v=2.0.2"></script>
+<script src="js/contracts/atv-utv.js?v=2.0.2"></script>
+<script src="js/contracts/nautico.js?v=2.0.2"></script>
+<script src="js/pdf-generator.js?v=2.0.2"></script>
+<script src="js/app.js?v=2.0.2"></script>
 
 </body>
 </html>

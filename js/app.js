@@ -387,7 +387,13 @@
 
   function setVal(id, value) {
     const el = document.getElementById(id);
-    if (el) el.value = value;
+    if (el) {
+      el.value = value;
+      try {
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      } catch (e) {}
+    }
   }
 
   // ---- Preview ----
@@ -578,6 +584,7 @@
   // ---- Public VenturaApp API ----
   window.showTab = selectCategory;
   window.selectCategory = selectCategory;
+  window.quickFill = quickFillSampleData;
   window.quickFillSampleData = quickFillSampleData;
   window.clearForm = clearForm;
   window.showPreview = showPreview;
