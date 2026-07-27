@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de geração rápida de contratos de compra e venda — Ventura Experience">
+  <title>Ventura Contratos — Gerador de Contratos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- jsPDF Local -->
+  <script src="js/lib/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="header">
+    <div class="header__badge">
+      <span>🌊 NAVEGAÇÃO, OFF-ROAD & LUXO — DOCUMENTOS OFICIAIS</span>
+    </div>
+    <div class="header__logos">
+      <img src="assets/logo-experience.png" alt="Ventura Experience" class="header__logo-img">
+      <div class="header__logo-divider"></div>
+      <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="header__logo-img">
+    </div>
+    <h1 class="header__brand">Ventura Experience & Marine</h1>
+    <p class="header__subtitle">Sistema de Alta Performance para Geração de Contratos de Compra e Venda</p>
+    <hr class="header__divider">
+  </header>
+
+  <!-- ==================== CATEGORY SELECTOR ==================== -->
+  <section class="category-selector" id="categorySelector">
+
+    <div class="category-card" data-category="atv" id="cardAtv" onclick="VenturaApp.selectCategory('atv')">
+      <span class="category-card__badge"></span>
+      <span class="category-card__icon">🏍️</span>
+      <h2 class="category-card__title">ATV / UTV / BRAT / EVO</h2>
+      <p class="category-card__desc">Quadriciclos, UTVs e veículos off-road</p>
+    </div>
+
+    <div class="category-card nautico" data-category="nautico" id="cardNautico" onclick="VenturaApp.selectCategory('nautico')">
+      <span class="category-card__badge"></span>
+      <span class="category-card__icon">🚤</span>
+      <h2 class="category-card__title">Embarcação Náutica</h2>
+      <p class="category-card__desc">Lanchas e embarcações Ventura Marine</p>
+    </div>
+
+  </section>
+
+  <!-- ==================== EMPTY STATE ==================== -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-state__icon">📋</div>
+    <p class="empty-state__text">Selecione uma categoria acima para começar</p>
+    <p class="empty-state__hint">Escolha o tipo de contrato que deseja gerar</p>
+  </div>
+
+  <!-- ==================== FORMULÁRIO ATV/UTV ==================== -->
+  <div class="form-container" id="form-atv">
+    <form id="formAtv" autocomplete="off">
+
+      <!-- Dados do Comprador -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">👤</div>
+          <h3 class="form-section__title">Dados do Comprador</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="atv-nome">Nome completo *</label>
+            <input type="text" id="atv-nome" placeholder="Nome completo do comprador">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="atv-cpfcnpj">CPF / CNPJ *</label>
+            <input type="text" id="atv-cpfcnpj" data-mask="cpfcnpj" placeholder="000.000.000-00">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="atv-rgie">RG / IE</label>
+            <input type="text" id="atv-rgie" placeholder="Documento de identidade">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label for="atv-rua">Rua</label>
+            <input type="text" id="atv-rua" placeholder="Rua / Avenida">
+          </div>
+          <div class="form-group">
+            <label for="atv-numero">Nº</label>
+            <input type="text" id="atv-numero" placeholder="Número">
+          </div>
+          <div class="form-group">
+            <label for="atv-bairro">Bairro</label>
+            <input type="text" id="atv-bairro" placeholder="Bairro">
+          </div>
+          <div class="form-group">
+            <label for="atv-complemento">Complemento</label>
+            <input type="text" id="atv-complemento" placeholder="Apto, bloco, etc.">
+          </div>
+          <div class="form-group">
+            <label for="atv-cidade">Cidade</label>
+            <input type="text" id="atv-cidade" placeholder="Cidade">
+          </div>
+          <div class="form-group">
+            <label for="atv-uf">UF</label>
+            <select id="atv-uf">
+              <option value="">Selecione</option>
+              <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+              <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+              <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+              <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+              <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+              <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+              <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+              <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+              <option value="SP" selected>SP</option><option value="SE">SE</option><option value="TO">TO</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="atv-cep">CEP</label>
+            <input type="text" id="atv-cep" data-mask="cep" placeholder="00000-000">
+          </div>
+          <div class="form-group">
+            <label for="atv-telefone">Telefone / WhatsApp</label>
+            <input type="text" id="atv-telefone" data-mask="telefone" placeholder="(00) 00000-0000">
+          </div>
+          <div class="form-group">
+            <label for="atv-email">E-mail</label>
+            <input type="email" id="atv-email" placeholder="email@exemplo.com">
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Dados do Veículo -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">🏍️</div>
+          <h3 class="form-section__title">Dados do Veículo</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="atv-tipo">Tipo *</label>
+            <select id="atv-tipo">
+              <option value="">Selecione o tipo</option>
+              <option value="ATV">ATV (Quadriciclo)</option>
+              <option value="UTV">UTV</option>
+              <option value="BRAT">BRAT</option>
+              <option value="EVO GRUNT">EVO GRUNT</option>
+            </select>
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="atv-marca">Marca</label>
+            <input type="text" id="atv-marca" value="VENTURA" data-prefill="VENTURA" placeholder="Marca">
+          </div>
+          <div class="form-group">
+            <label for="atv-modelo">Modelo *</label>
+            <input type="text" id="atv-modelo" placeholder="Ex: LAND FORCE 650">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="atv-cor">Cor</label>
+            <input type="text" id="atv-cor" placeholder="Cor do veículo">
+          </div>
+          <div class="form-group">
+            <label for="atv-chassi">Chassi / Série</label>
+            <input type="text" id="atv-chassi" placeholder="Número do chassi ou série">
+          </div>
+          <div class="form-group">
+            <label for="atv-origem">Origem do veículo</label>
+            <select id="atv-origem">
+              <option value="FÁBRICA">🏭 Vindo da Fábrica</option>
+              <option value="SHOWROOM">🏬 Disponível no Showroom</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="atv-itens">Itens inclusos</label>
+            <textarea id="atv-itens" placeholder="TODOS OS ITENS DE SÉRIE (ou detalhe os itens)">TODOS OS ITENS DE SÉRIE</textarea>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Dados Financeiros -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">💰</div>
+          <h3 class="form-section__title">Dados Financeiros e Entrega</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="atv-valor-total">Valor total *</label>
+            <input type="text" id="atv-valor-total" data-mask="moeda" placeholder="R$ 0,00">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="atv-sinal">Sinal / Entrada</label>
+            <input type="text" id="atv-sinal" data-mask="moeda" placeholder="R$ 0,00">
+          </div>
+          <div class="form-group full-width">
+            <label for="atv-saldo">Saldo restante (valor + condições)</label>
+            <input type="text" id="atv-saldo" placeholder="Ex: R$ 65.000,00 em 10x sem juros">
+          </div>
+          <div class="form-group">
+            <label for="atv-prazo">Prazo de entrega (dias úteis)</label>
+            <input type="number" id="atv-prazo" value="15" min="1" placeholder="15">
+          </div>
+          <div class="form-group">
+            <label for="atv-local-entrega">Local de entrega</label>
+            <input type="text" id="atv-local-entrega" value="Ribeirão Preto" data-prefill="Ribeirão Preto" placeholder="Cidade de entrega">
+          </div>
+          <div class="form-group">
+            <label for="atv-responsavel">Responsável pelo transporte</label>
+            <select id="atv-responsavel">
+              <option value="VENDEDORA">VENDEDORA</option>
+              <option value="COMPRADOR">COMPRADOR</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="atv-data">Data do contrato *</label>
+            <input type="text" id="atv-data" data-default="today" placeholder="DD/MM/AAAA">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caixa de Alerta de Validação -->
+      <div class="validation-box" id="valBoxAtv">
+        <div class="validation-box__title">⚠️ Atenção: Preencha os campos obrigatórios para continuar</div>
+        <ul class="validation-box__list" id="valListAtv"></ul>
+        <div class="validation-box__hint">💡 Dica: Você pode usar o botão "⚡ Preencher Exemplo" para preencher dados de teste em 1 clique!</div>
+      </div>
+
+      <!-- Ações -->
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" id="btnQuickFillAtv" onclick="VenturaApp.quickFill('atv')" style="border-color: var(--color-accent); color: var(--color-accent-light);">
+          <span class="btn-icon">⚡</span> Preencher Exemplo
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnClearAtv" onclick="VenturaApp.clear('formAtv')">
+          <span class="btn-icon">🧹</span> Limpar
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnPreviewAtv" onclick="VenturaApp.preview('atv')">
+          <span class="btn-icon">👁️</span> Pré-visualizar
+        </button>
+        <button type="button" class="btn btn-primary" id="btnGenerateAtv" onclick="VenturaApp.generate('atv')">
+          <span class="btn-icon">📄</span> Gerar Contrato PDF
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ==================== FORMULÁRIO NÁUTICO ==================== -->
+  <div class="form-container" id="form-nautico">
+    <form id="formNautico" autocomplete="off">
+
+      <!-- Dados do Comprador -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">👤</div>
+          <h3 class="form-section__title">Dados do Comprador</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="naut-nome">Nome completo *</label>
+            <input type="text" id="naut-nome" placeholder="Nome completo do comprador">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="naut-cpf">CPF / CNPJ *</label>
+            <input type="text" id="naut-cpf" data-mask="cpfcnpj" placeholder="000.000.000-00">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="naut-rg">RG</label>
+            <input type="text" id="naut-rg" placeholder="Documento de identidade">
+          </div>
+          <div class="form-group full-width">
+            <label for="naut-endereco">Endereço completo</label>
+            <input type="text" id="naut-endereco" placeholder="Rua, número, bairro, cidade/UF, CEP">
+          </div>
+          <div class="form-group">
+            <label for="naut-telefone">Telefone</label>
+            <input type="text" id="naut-telefone" data-mask="telefone" placeholder="(00) 00000-0000">
+          </div>
+          <div class="form-group">
+            <label for="naut-email">E-mail</label>
+            <input type="email" id="naut-email" placeholder="email@exemplo.com">
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Dados da Embarcação -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">🚤</div>
+          <h3 class="form-section__title">Dados da Embarcação</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="naut-modelo">Modelo da embarcação *</label>
+            <input type="text" id="naut-modelo" placeholder="Ex: V195, V240">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="naut-cor-casco">Cor do casco</label>
+            <input type="text" id="naut-cor-casco" placeholder="Cor do casco">
+          </div>
+          <div class="form-group">
+            <label for="naut-cor-estofamentos">Cor dos estofamentos</label>
+            <input type="text" id="naut-cor-estofamentos" placeholder="Cor dos estofamentos">
+          </div>
+          <div class="form-group">
+            <label for="naut-ano-modelo">Ano / Modelo</label>
+            <input type="text" id="naut-ano-modelo" placeholder="Ex: 2025/2025">
+          </div>
+          <div class="form-group">
+            <label for="naut-motorizacao">Motorização</label>
+            <input type="text" id="naut-motorizacao" placeholder="Ex: Mercury 150HP">
+          </div>
+          <div class="form-group">
+            <label for="naut-origem">Origem da embarcação</label>
+            <select id="naut-origem">
+              <option value="FÁBRICA">🏭 Vindo da Fábrica</option>
+              <option value="SHOWROOM">🏬 Disponível no Showroom</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="naut-acessorios">Acessórios</label>
+            <textarea id="naut-acessorios" placeholder="Lista de acessórios incluídos"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Dados Financeiros -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">💰</div>
+          <h3 class="form-section__title">Preço e Condições de Pagamento</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="naut-valor-total">Valor total da embarcação *</label>
+            <input type="text" id="naut-valor-total" data-mask="moeda" placeholder="R$ 0,00">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+          <div class="form-group">
+            <label for="naut-sinal">Sinal</label>
+            <input type="text" id="naut-sinal" data-mask="moeda" placeholder="R$ 0,00">
+          </div>
+          <div class="form-group">
+            <label for="naut-entrada">Entrada</label>
+            <input type="text" id="naut-entrada" data-mask="moeda" placeholder="R$ 0,00">
+          </div>
+          <div class="form-group full-width">
+            <label for="naut-permuta">Permuta (valor e descrição, se houver)</label>
+            <textarea id="naut-permuta" placeholder="Ex: R$ 50.000,00 — Lancha modelo XYZ ano 2020"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="naut-contra-embarque">Contra embarque</label>
+            <input type="text" id="naut-contra-embarque" data-mask="moeda" placeholder="R$ 0,00">
+          </div>
+          <div class="form-group">
+            <label for="naut-parc-fabrica">Parcelamento boleto (fábrica)</label>
+            <input type="text" id="naut-parc-fabrica" placeholder="Ex: R$ 5.000 em 12x">
+          </div>
+          <div class="form-group full-width">
+            <label for="naut-parc-bancario">Parcelamento bancário / cartão de crédito</label>
+            <input type="text" id="naut-parc-bancario" placeholder="Ex: 24x via banco Santander">
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- Entrega -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="form-section__icon">🚚</div>
+          <h3 class="form-section__title">Entrega</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="naut-prazo">Prazo de entrega</label>
+            <input type="text" id="naut-prazo" placeholder="Ex: 30 dias">
+          </div>
+          <div class="form-group">
+            <label for="naut-cidade-entrega">Cidade de entrega</label>
+            <input type="text" id="naut-cidade-entrega" placeholder="Cidade de entrega">
+          </div>
+          <div class="form-group">
+            <label for="naut-responsavel">Responsável pelo frete</label>
+            <select id="naut-responsavel">
+              <option value="VENDEDORA">VENDEDORA</option>
+              <option value="COMPRADOR">COMPRADOR</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="naut-data">Data do contrato *</label>
+            <input type="text" id="naut-data" data-default="today" placeholder="DD/MM/AAAA">
+            <span class="error-message">Campo obrigatório</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caixa de Alerta de Validação -->
+      <div class="validation-box" id="valBoxNautico">
+        <div class="validation-box__title">⚠️ Atenção: Preencha os campos obrigatórios para continuar</div>
+        <ul class="validation-box__list" id="valListNautico"></ul>
+        <div class="validation-box__hint">💡 Dica: Você pode usar o botão "⚡ Preencher Exemplo" para preencher dados de teste em 1 clique!</div>
+      </div>
+
+      <!-- Ações -->
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" id="btnQuickFillNautico" onclick="VenturaApp.quickFill('nautico')" style="border-color: var(--color-nautico); color: #93C5FD;">
+          <span class="btn-icon">⚡</span> Preencher Exemplo
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnClearNautico" onclick="VenturaApp.clear('formNautico')">
+          <span class="btn-icon">🧹</span> Limpar
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnPreviewNautico" onclick="VenturaApp.preview('nautico')">
+          <span class="btn-icon">👁️</span> Pré-visualizar
+        </button>
+        <button type="button" class="btn btn-primary" id="btnGenerateNautico" onclick="VenturaApp.generate('nautico')">
+          <span class="btn-icon">📄</span> Gerar Contrato PDF
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ==================== PREVIEW PANEL ==================== -->
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-panel__header">
+      <span class="preview-panel__title">👁️ Pré-visualização do Contrato</span>
+      <button type="button" class="btn btn-secondary" id="btnClosePreview" onclick="VenturaApp.closePreview()" style="padding: 8px 16px; font-size: 0.82rem;">
+        ✕ Fechar
+      </button>
+    </div>
+    <div class="preview-panel__content" id="previewContent"></div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <p>Ventura Experience LTDA — Sistema interno de geração de contratos</p>
+  </footer>
+
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast" id="toast"></div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="assets/logos.js"></script>
+<script src="js/contracts/atv-utv.js"></script>
+<script src="js/contracts/nautico.js"></script>
+<script src="js/pdf-generator.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
