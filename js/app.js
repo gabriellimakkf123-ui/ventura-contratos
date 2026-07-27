@@ -39,40 +39,51 @@
 
   // ---- Seleção de Categoria ----
   function selectCategory(category) {
-    currentCategory = category;
+    try {
+      currentCategory = category;
 
-    // Ocultar empty state
-    const emptyState = document.getElementById('emptyState');
-    if (emptyState) {
-      emptyState.style.display = 'none';
-    }
-
-    // Atualizar cards
-    const cards = document.querySelectorAll('.category-card');
-    cards.forEach(function(card) {
-      card.classList.remove('active');
-      if (card.dataset.category === category) {
-        card.classList.add('active');
+      // Ocultar empty state
+      const emptyState = document.getElementById('emptyState');
+      if (emptyState) {
+        emptyState.style.display = 'none';
       }
-    });
 
-    // Mostrar/ocultar formulários
-    const containers = document.querySelectorAll('.form-container');
-    containers.forEach(function(container) {
-      container.classList.remove('visible');
-    });
+      // Atualizar cards
+      const cards = document.querySelectorAll('.category-card');
+      cards.forEach(function(card) {
+        if (card.dataset.category === category) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
 
-    const targetForm = document.getElementById('form-' + category);
-    if (targetForm) {
-      setTimeout(function() {
-        targetForm.classList.add('visible');
-      }, 50);
+      // Mostrar/ocultar formulários instantaneamente
+      const containers = document.querySelectorAll('.form-container');
+      containers.forEach(function(container) {
+        if (container.id === 'form-' + category) {
+          container.classList.add('visible');
+          container.style.display = 'block';
+        } else {
+          container.classList.remove('visible');
+          container.style.display = 'none';
+        }
+      });
+
+      // Ocultar preview e caixas de validação ao trocar
+      hidePreview();
+      hideValidationBox('atv');
+      hideValidationBox('nautico');
+
+      // Rolar até o formulário selecionado
+      const targetForm = document.getElementById('form-' + category);
+      if (targetForm) {
+        targetForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } catch (e) {
+      console.error('Erro ao selecionar categoria:', e);
+      alert('Erro ao trocar de categoria: ' + e.message);
     }
-
-    // Ocultar preview e caixas de validação ao trocar
-    hidePreview();
-    hideValidationBox('atv');
-    hideValidationBox('nautico');
   }
 
   // ---- Máscaras de Input ----
