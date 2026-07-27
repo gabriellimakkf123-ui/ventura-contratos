@@ -576,6 +576,7 @@
   }
 
   // ---- Public VenturaApp API ----
+  window.showTab = selectCategory;
   window.selectCategory = selectCategory;
   window.quickFillSampleData = quickFillSampleData;
   window.clearForm = clearForm;

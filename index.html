@@ -31,14 +31,14 @@
   <!-- ==================== CATEGORY SELECTOR ==================== -->
   <section class="category-selector" id="categorySelector">
 
-    <div class="category-card" data-category="atv" id="cardAtv" onclick="VenturaApp.selectCategory('atv')">
+    <div class="category-card" data-category="atv" id="cardAtv" onclick="showTab('atv')">
       <span class="category-card__badge"></span>
       <span class="category-card__icon">🏍️</span>
       <h2 class="category-card__title">ATV / UTV / BRAT / EVO</h2>
       <p class="category-card__desc">Quadriciclos, UTVs e veículos off-road</p>
     </div>
 
-    <div class="category-card nautico" data-category="nautico" id="cardNautico" onclick="VenturaApp.selectCategory('nautico')">
+    <div class="category-card nautico active" data-category="nautico" id="cardNautico" onclick="showTab('nautico')">
       <span class="category-card__badge"></span>
       <span class="category-card__icon">🚤</span>
       <h2 class="category-card__title">Embarcação Náutica</h2>
@@ -47,15 +47,8 @@
 
   </section>
 
-  <!-- ==================== EMPTY STATE ==================== -->
-  <div class="empty-state" id="emptyState">
-    <div class="empty-state__icon">📋</div>
-    <p class="empty-state__text">Selecione uma categoria acima para começar</p>
-    <p class="empty-state__hint">Escolha o tipo de contrato que deseja gerar</p>
-  </div>
-
   <!-- ==================== FORMULÁRIO ATV/UTV ==================== -->
-  <div class="form-container" id="form-atv">
+  <div class="form-container" id="form-atv" style="display: none;">
     <form id="formAtv" autocomplete="off">
 
       <!-- Dados do Comprador -->
@@ -252,7 +245,7 @@
   </div>
 
   <!-- ==================== FORMULÁRIO NÁUTICO ==================== -->
-  <div class="form-container" id="form-nautico">
+  <div class="form-container visible" id="form-nautico" style="display: block;">
     <form id="formNautico" autocomplete="off">
 
       <!-- Dados do Comprador -->
@@ -484,11 +477,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=1.0.3"></script>
-<script src="js/contracts/atv-utv.js?v=1.0.3"></script>
-<script src="js/contracts/nautico.js?v=1.0.3"></script>
-<script src="js/pdf-generator.js?v=1.0.3"></script>
-<script src="js/app.js?v=1.0.3"></script>
+<script src="assets/logos.js?v=2.0.0"></script>
+<script src="js/contracts/atv-utv.js?v=2.0.0"></script>
+<script src="js/contracts/nautico.js?v=2.0.0"></script>
+<script src="js/pdf-generator.js?v=2.0.0"></script>
+<script src="js/app.js?v=2.0.0"></script>
 
 </body>
 </html>
