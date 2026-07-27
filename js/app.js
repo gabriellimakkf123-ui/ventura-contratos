@@ -506,6 +506,8 @@
     } catch (e) {
       console.error('Erro ao limpar formulário:', e);
     }
+  }
+
   // ---- Gerador Automático de Parcelas de Boleto ----
   function generateBoletoSchedule(category) {
     try {
