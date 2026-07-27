@@ -218,6 +218,10 @@ body::before {
   text-align: center;
 }
 
+.category-card * {
+  pointer-events: none;
+}
+
 .category-card::before {
   content: '';
   position: absolute;

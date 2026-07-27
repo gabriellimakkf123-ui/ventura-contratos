@@ -5,9 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Sistema de geração rápida de contratos de compra e venda — Ventura Experience">
   <title>Ventura Contratos — Gerador de Contratos</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2.0.1">
   <!-- jsPDF Local -->
   <script src="js/lib/jspdf.umd.min.js"></script>
+  <script>
+    function showTab(cat) {
+      var cAtv = document.getElementById('cardAtv');
+      var cNaut = document.getElementById('cardNautico');
+      var fAtv = document.getElementById('form-atv');
+      var fNaut = document.getElementById('form-nautico');
+      if (cat === 'atv') {
+        if (cAtv) cAtv.className = 'category-card active';
+        if (cNaut) cNaut.className = 'category-card nautico';
+        if (fAtv) { fAtv.className = 'form-container visible'; fAtv.style.display = 'block'; }
+        if (fNaut) { fNaut.className = 'form-container'; fNaut.style.display = 'none'; }
+      } else {
+        if (cAtv) cAtv.className = 'category-card';
+        if (cNaut) cNaut.className = 'category-card nautico active';
+        if (fAtv) { fAtv.className = 'form-container'; fAtv.style.display = 'none'; }
+        if (fNaut) { fNaut.className = 'form-container visible'; fNaut.style.display = 'block'; }
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -477,11 +496,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=2.0.0"></script>
-<script src="js/contracts/atv-utv.js?v=2.0.0"></script>
-<script src="js/contracts/nautico.js?v=2.0.0"></script>
-<script src="js/pdf-generator.js?v=2.0.0"></script>
-<script src="js/app.js?v=2.0.0"></script>
+<script src="assets/logos.js?v=2.0.1"></script>
+<script src="js/contracts/atv-utv.js?v=2.0.1"></script>
+<script src="js/contracts/nautico.js?v=2.0.1"></script>
+<script src="js/pdf-generator.js?v=2.0.1"></script>
+<script src="js/app.js?v=2.0.1"></script>
 
 </body>
 </html>
