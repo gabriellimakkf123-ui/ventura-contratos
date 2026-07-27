@@ -32,6 +32,9 @@
 
       // Preencher data atual
       setTodayDate();
+
+      // Auto-selecionar 'nautico' por padrão para o formulário já abrir aberto e pronto
+      selectCategory('nautico');
     } catch (e) {
       console.error('Erro na inicialização:', e);
     }
@@ -573,6 +576,14 @@
   }
 
   // ---- Public VenturaApp API ----
+  window.selectCategory = selectCategory;
+  window.quickFillSampleData = quickFillSampleData;
+  window.clearForm = clearForm;
+  window.showPreview = showPreview;
+  window.hidePreview = hidePreview;
+  window.generatePDF = generatePDF;
+  window.generateBoletoSchedule = generateBoletoSchedule;
+
   window.VenturaApp = {
     selectCategory: selectCategory,
     quickFill: quickFillSampleData,
