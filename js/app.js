@@ -370,7 +370,7 @@
         setVal('naut-gen-dia', '25');
         setVal('naut-gen-inicio', '08/2026');
         setVal('naut-gen-fim', '02/2027');
-        generateBoletoSchedule('nautico');
+        setVal('naut-parc-fabrica', '1ª Parcela: R$ 10.000,00 — Vencimento: 25/08/2026\n2ª Parcela: R$ 10.000,00 — Vencimento: 25/09/2026\n3ª Parcela: R$ 10.000,00 — Vencimento: 25/10/2026\n4ª Parcela: R$ 10.000,00 — Vencimento: 25/11/2026\n5ª Parcela: R$ 10.000,00 — Vencimento: 25/12/2026\n6ª Parcela: R$ 10.000,00 — Vencimento: 25/01/2027\n7ª Parcela: R$ 10.000,00 — Vencimento: 25/02/2027');
         setVal('naut-parc-bancario', '');
         setVal('naut-prazo', '30 dias úteis');
         setVal('naut-cidade-entrega', 'Capitólio/MG');
@@ -390,8 +390,13 @@
     if (el) {
       el.value = value;
       try {
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
+        const evInput = document.createEvent('Event');
+        evInput.initEvent('input', true, true);
+        el.dispatchEvent(evInput);
+
+        const evChange = document.createEvent('Event');
+        evChange.initEvent('change', true, true);
+        el.dispatchEvent(evChange);
       } catch (e) {}
     }
   }
@@ -587,9 +592,12 @@
   window.quickFill = quickFillSampleData;
   window.quickFillSampleData = quickFillSampleData;
   window.clearForm = clearForm;
+  window.clearFormApp = clearForm;
   window.showPreview = showPreview;
+  window.showPreviewApp = showPreview;
   window.hidePreview = hidePreview;
   window.generatePDF = generatePDF;
+  window.generatePDFApp = generatePDF;
   window.generateBoletoSchedule = generateBoletoSchedule;
 
   window.VenturaApp = {

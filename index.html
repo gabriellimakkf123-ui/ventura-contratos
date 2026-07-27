@@ -26,6 +26,38 @@
         if (fNaut) { fNaut.className = 'form-container visible'; fNaut.style.display = 'block'; }
       }
     }
+
+    function quickFill(cat) {
+      if (window.quickFillSampleData) {
+        window.quickFillSampleData(cat);
+      } else if (window.VenturaApp && window.VenturaApp.quickFill) {
+        window.VenturaApp.quickFill(cat);
+      }
+    }
+
+    function clearForm(formId) {
+      if (window.clearFormApp) {
+        window.clearFormApp(formId);
+      } else if (window.VenturaApp && window.VenturaApp.clear) {
+        window.VenturaApp.clear(formId);
+      }
+    }
+
+    function showPreview(cat) {
+      if (window.showPreviewApp) {
+        window.showPreviewApp(cat);
+      } else if (window.VenturaApp && window.VenturaApp.preview) {
+        window.VenturaApp.preview(cat);
+      }
+    }
+
+    function generatePDF(cat) {
+      if (window.generatePDFApp) {
+        window.generatePDFApp(cat);
+      } else if (window.VenturaApp && window.VenturaApp.generate) {
+        window.VenturaApp.generate(cat);
+      }
+    }
   </script>
 </head>
 <body>
@@ -496,11 +528,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=2.0.2"></script>
-<script src="js/contracts/atv-utv.js?v=2.0.2"></script>
-<script src="js/contracts/nautico.js?v=2.0.2"></script>
-<script src="js/pdf-generator.js?v=2.0.2"></script>
-<script src="js/app.js?v=2.0.2"></script>
+<script src="assets/logos.js?v=2.0.3"></script>
+<script src="js/contracts/atv-utv.js?v=2.0.3"></script>
+<script src="js/contracts/nautico.js?v=2.0.3"></script>
+<script src="js/pdf-generator.js?v=2.0.3"></script>
+<script src="js/app.js?v=2.0.3"></script>
 
 </body>
 </html>
