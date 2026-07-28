@@ -349,24 +349,18 @@
           </div>
         </div>
 
-        <!-- 1. Seletor de Modelo (Linha Comfort) -->
+        <!-- 1. Seletor de Linha e Modelo de Embarcação -->
         <div class="config-step">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <label class="config-label" style="margin-bottom: 0;">1. Escolha a Linha e o Modelo da Embarcação:</label>
-            <span style="font-size: 0.78rem; background: rgba(37, 99, 235, 0.15); color: #60A5FA; padding: 3px 10px; border-radius: var(--radius-full); border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 600;">🔷 Linha Comfort</span>
+          <label class="config-label">1. Escolha a Linha da Embarcação:</label>
+          <div class="linha-tabs" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <button type="button" class="linha-tab active" id="tabComfort" onclick="selectLinhaCategory('comfort')" style="padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-nautico); background: rgba(37,99,235,0.18); color: #FFF; font-weight: 700; cursor: pointer; transition: all 0.2s;">🔷 Linha Comfort (11)</button>
+            <button type="button" class="linha-tab" id="tabPremium" onclick="selectLinhaCategory('premium')" style="padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s;">🟢 Linha Premium (6)</button>
+            <button type="button" class="linha-tab" id="tabPontoon" onclick="selectLinhaCategory('pontoon')" style="padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s;">🟣 Pontoon Series (4)</button>
           </div>
-          <div class="model-pills">
-            <button type="button" class="model-pill active" data-model="V195 Comfort - NEW" onclick="selectBoatModel('V195 Comfort - NEW')">V195 Comfort - NEW ⭐</button>
-            <button type="button" class="model-pill" data-model="V205 CROSSOVER" onclick="selectBoatModel('V205 CROSSOVER')">V205 CROSSOVER</button>
-            <button type="button" class="model-pill" data-model="V210 Comfort" onclick="selectBoatModel('V210 Comfort')">V210 Comfort</button>
-            <button type="button" class="model-pill" data-model="V215 Cabin Comfort" onclick="selectBoatModel('V215 Cabin Comfort')">V215 Cabin Comfort</button>
-            <button type="button" class="model-pill" data-model="V220 SURF" onclick="selectBoatModel('V220 SURF')">V220 SURF</button>
-            <button type="button" class="model-pill" data-model="V230 GII Comfort" onclick="selectBoatModel('V230 GII Comfort')">V230 GII Comfort</button>
-            <button type="button" class="model-pill" data-model="V250 Comfort" onclick="selectBoatModel('V250 Comfort')">V250 Comfort</button>
-            <button type="button" class="model-pill" data-model="V250 Sport" onclick="selectBoatModel('V250 Sport')">V250 Sport</button>
-            <button type="button" class="model-pill" data-model="V265 Cabin Comfort" onclick="selectBoatModel('V265 Cabin Comfort')">V265 Cabin Comfort</button>
-            <button type="button" class="model-pill" data-model="V300 Crossover" onclick="selectBoatModel('V300 Crossover')">V300 Crossover</button>
-            <button type="button" class="model-pill" data-model="V300 Day Cruiser" onclick="selectBoatModel('V300 Day Cruiser')">V300 Day Cruiser</button>
+
+          <label class="config-label">2. Escolha o Modelo da Embarcação:</label>
+          <div class="model-pills" id="modelPillsGrid">
+            <!-- Renderizado dinamicamente pelo JS -->
           </div>
         </div>
 
@@ -603,11 +597,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=4.1.0"></script>
-<script src="js/contracts/atv-utv.js?v=4.1.0"></script>
-<script src="js/contracts/nautico.js?v=4.1.0"></script>
-<script src="js/pdf-generator.js?v=4.1.0"></script>
-<script src="js/app.js?v=4.1.0"></script>
+<script src="assets/logos.js?v=5.0.0"></script>
+<script src="js/contracts/atv-utv.js?v=5.0.0"></script>
+<script src="js/contracts/nautico.js?v=5.0.0"></script>
+<script src="js/pdf-generator.js?v=5.0.0"></script>
+<script src="js/app.js?v=5.0.0"></script>
 
 </body>
 </html>

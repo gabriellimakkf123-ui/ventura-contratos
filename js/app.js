@@ -606,6 +606,22 @@
     'V300 Day Cruiser'
   ];
 
+  const PREMIUM_MODELS = [
+    'V370 Crossover',
+    'V400 CROSSOVER PREMIUM',
+    'V400 HT PREMIUM',
+    'V450 FLY PREMIUM',
+    'V550 Crossover',
+    'V550 FLY BRIDGE'
+  ];
+
+  const PONTOON_MODELS = [
+    'IRON 25',
+    'IRON 32',
+    'Pontoon 250',
+    'Pontoon 320'
+  ];
+
   const VENTURA_MODELS_DATA = {
     'V195 Comfort - NEW': {
       model: 'V195 Comfort - NEW',
@@ -649,19 +665,21 @@
     }
   };
 
-  // Cadastrar modelos genéricos para os outros 10 barcos da Linha Comfort
-  COMFORT_MODELS.forEach(m => {
+  // Registrar todos os modelos de todas as 3 linhas
+  [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
     if (m !== 'V195 Comfort - NEW') {
+      const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
-        linha: 'Linha Comfort',
+        linha: linha,
         conjuntos: [],
         acessorios: { opcionaisSugeridos: [], kitsPremium: [], opcionaisServico: [] }
       };
     }
   });
 
-  let selectedBoatModel = 'V195';
+  let selectedLinhaKey = 'comfort'; // 'comfort', 'premium', 'pontoon'
+  let selectedBoatModel = 'V195 Comfort - NEW';
   let selectedConjuntoId = 'c1';
   let selectedAccessoryIds = new Set();
 
@@ -669,8 +687,59 @@
     return 'R$ ' + Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  function selectLinhaCategory(linhaKey) {
+    selectedLinhaKey = linhaKey;
+    let firstModel = 'V195 Comfort - NEW';
+    if (linhaKey === 'comfort') firstModel = COMFORT_MODELS[0];
+    else if (linhaKey === 'premium') firstModel = PREMIUM_MODELS[0];
+    else if (linhaKey === 'pontoon') firstModel = PONTOON_MODELS[0];
+
+    selectedBoatModel = firstModel;
+    const data = VENTURA_MODELS_DATA[firstModel];
+    selectedConjuntoId = (data && data.conjuntos && data.conjuntos.length > 0) ? data.conjuntos[0].id : null;
+    selectedAccessoryIds.clear();
+
+    updateLinhaTabsUI();
+    renderModelPillsGrid();
+    initBoatConfigurator();
+  }
+
+  function updateLinhaTabsUI() {
+    const tC = document.getElementById('tabComfort');
+    const tP = document.getElementById('tabPremium');
+    const tPo = document.getElementById('tabPontoon');
+
+    const activeStyle = "padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-nautico); background: rgba(37,99,235,0.22); color: #FFF; font-weight: 700; cursor: pointer; transition: all 0.2s;";
+    const inactiveStyle = "padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s;";
+
+    if (tC) tC.style.cssText = selectedLinhaKey === 'comfort' ? activeStyle : inactiveStyle;
+    if (tP) tP.style.cssText = selectedLinhaKey === 'premium' ? activeStyle : inactiveStyle;
+    if (tPo) tPo.style.cssText = selectedLinhaKey === 'pontoon' ? activeStyle : inactiveStyle;
+  }
+
+  function renderModelPillsGrid() {
+    const grid = document.getElementById('modelPillsGrid');
+    if (!grid) return;
+
+    let models = COMFORT_MODELS;
+    if (selectedLinhaKey === 'premium') models = PREMIUM_MODELS;
+    else if (selectedLinhaKey === 'pontoon') models = PONTOON_MODELS;
+
+    let html = '';
+    models.forEach(m => {
+      const activeClass = m === selectedBoatModel ? 'active' : '';
+      const star = m === 'V195 Comfort - NEW' ? ' ⭐' : '';
+      html += `
+        <button type="button" class="model-pill ${activeClass}" data-model="${m}" onclick="selectBoatModel('${m}')">${m}${star}</button>
+      `;
+    });
+    grid.innerHTML = html;
+  }
+
   function initBoatConfigurator() {
     try {
+      updateLinhaTabsUI();
+      renderModelPillsGrid();
       renderConjuntosGrid();
       renderAccessoriesGrid();
       updateConfiguratorUI();
@@ -682,7 +751,8 @@
   function selectBoatModel(model) {
     if (!VENTURA_MODELS_DATA[model]) return;
     selectedBoatModel = model;
-    selectedConjuntoId = VENTURA_MODELS_DATA[model].conjuntos[0].id;
+    const data = VENTURA_MODELS_DATA[model];
+    selectedConjuntoId = (data && data.conjuntos && data.conjuntos.length > 0) ? data.conjuntos[0].id : null;
     selectedAccessoryIds.clear();
     initBoatConfigurator();
   }
@@ -820,6 +890,7 @@
   // ---- Public VenturaApp API ----
   window.showTab = selectCategory;
   window.selectCategory = selectCategory;
+  window.selectLinhaCategory = selectLinhaCategory;
   window.selectBoatModel = selectBoatModel;
   window.selectBoatConjunto = selectBoatConjunto;
   window.toggleAccessory = toggleAccessory;
