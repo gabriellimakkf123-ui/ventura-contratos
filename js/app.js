@@ -662,12 +662,54 @@
           { id: 'acc_21', name: 'Carreta rodo encalhe de madeira', price: 11900 }
         ]
       }
+    },
+
+    'V205 CROSSOVER': {
+      model: 'V205 CROSSOVER',
+      linha: 'Linha Comfort',
+      conjuntos: [
+        { id: 'v205_c1', title: 'V205 CROSS = Casco + Montagem + F115 BETL 4T Yamaha', motor: 'F115 BETL 4T Yamaha', price: 217500 },
+        { id: 'v205_c2', title: 'V205 CROSS = Casco + Montagem + F150 DETL 4T Yamaha', motor: 'F150 DETL 4T Yamaha', price: 239900 },
+        { id: 'v205_c3', title: 'V205 CROSS = Casco + Montagem + 115 ELPT 4T Mercury', motor: '115 ELPT 4T Mercury', price: 249900 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'v205_acc_1', name: 'Sistema de Som (01 CD Player, 04 Alto-Falantes, 01 Antena, 01 Bolha)', price: 1800 },
+          { id: 'v205_acc_2', name: 'Buzina de Embutir', price: 450 },
+          { id: 'v205_acc_3', name: 'Capota V205 barco com Targa', price: 4900 },
+          { id: 'v205_acc_4', name: 'Porta-Varas (2)', price: 640 },
+          { id: 'v205_acc_5', name: 'Ventura System', price: 14900 },
+          { id: 'v205_acc_6', name: 'Tomada 12 Volts', price: 195 },
+          { id: 'v205_acc_7', name: 'Buzina de Corneta Simples', price: 590 },
+          { id: 'v205_acc_8', name: 'Capota V205', price: 2800 },
+          { id: 'v205_acc_9', name: 'Bússola', price: 290 },
+          { id: 'v205_acc_10', name: 'Marcador de Combustível', price: 1650 },
+          { id: 'v205_acc_11', name: 'Sistema de Direção Hidráulica - para versão Popa', price: 10900 },
+          { id: 'v205_acc_12', name: 'Suporte de defensas (2 Pares) (V195, V205, V210, V215, V220)', price: 320 },
+          { id: 'v205_acc_13', name: 'GPS 5', price: 5500 },
+          { id: 'v205_acc_14', name: 'Defensas G3 (2 unidades) (V195, V205, V210, V215, V220)', price: 380 },
+          { id: 'v205_acc_15', name: 'Radio VHF com antena e suporte', price: 3200 },
+          { id: 'v205_acc_16', name: 'GPS 7', price: 7950 }
+        ],
+        kitsPremium: [
+          { id: 'v205_acc_17', name: 'Kit EVA', price: 4890 },
+          { id: 'v205_acc_18', name: 'Kit Salvatagem (08 COLETES CLASSE V, 01 ANCORA DF 400, 50 MTS DE CABO, 01 BAND. BRASIL, 01 APITO, 01 EXTINTOR, 01 SUP. DE BOIA NÁUTICA)', price: 3070 },
+          { id: 'v205_acc_19', name: 'Kit churrasqueira (churrasqueira, suporte e pedestal)', price: 4100 },
+          { id: 'v205_acc_20', name: 'Targa V205', price: 16900 }
+        ],
+        opcionaisServico: [
+          { id: 'v205_acc_21', name: 'Segunda Bateria', price: 1850 },
+          { id: 'v205_acc_22', name: 'Carreta Rodoviária de Metal V195 e V205', price: 17200 },
+          { id: 'v205_acc_23', name: 'Lona de cobertura V205', price: 3890 },
+          { id: 'v205_acc_24', name: 'Carreta rodo encalhe de madeira', price: 11900 }
+        ]
+      }
     }
   };
 
   // Registrar todos os modelos de todas as 3 linhas
   [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
-    if (m !== 'V195 Comfort - NEW') {
+    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER') {
       const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
@@ -728,7 +770,9 @@
     let html = '';
     models.forEach(m => {
       const activeClass = m === selectedBoatModel ? 'active' : '';
-      const star = m === 'V195 Comfort - NEW' ? ' ⭐' : '';
+      const data = VENTURA_MODELS_DATA[m];
+      const isConfigured = data && data.conjuntos && data.conjuntos.length > 0;
+      const star = isConfigured ? ' ⭐' : '';
       html += `
         <button type="button" class="model-pill ${activeClass}" data-model="${m}" onclick="selectBoatModel('${m}')">${m}${star}</button>
       `;
