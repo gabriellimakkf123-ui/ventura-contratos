@@ -337,6 +337,74 @@
 
       <hr class="section-divider">
 
+      <!-- Monte sua Embarcação Ventura (Configurador de Conjuntos e Acessórios) -->
+      <div class="configurator-box" id="boatConfigurator">
+        <div class="configurator-header">
+          <div class="configurator-title">
+            <span class="configurator-icon" style="font-size: 24px;">⚙️</span>
+            <div>
+              <h4>Monte sua Embarcação Ventura (Configurador Oficial)</h4>
+              <p>Escolha o Modelo, o Conjunto (Casco + Montagem + Motor) e os Acessórios Opcionais por Categoria</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1. Seletor de Modelo -->
+        <div class="config-step">
+          <label class="config-label">1. Escolha o Modelo da Embarcação:</label>
+          <div class="model-pills">
+            <button type="button" class="model-pill active" data-model="V195" onclick="selectBoatModel('V195')">V195</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V210 🔒</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V240 🔒</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V270 🔒</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V300 🔒</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V400 🔒</button>
+            <button type="button" class="model-pill disabled" title="Em breve">V550 Flybridge 🔒</button>
+          </div>
+        </div>
+
+        <!-- 2. Seletor de Conjunto -->
+        <div class="config-step" id="conjuntosSection">
+          <label class="config-label">2. Escolha o Conjunto (Casco + Montagem + Motorização):</label>
+          <div class="conjuntos-grid" id="conjuntosGrid"></div>
+        </div>
+
+        <!-- 3. Seletor de Acessórios por Categoria -->
+        <div class="config-step" id="acessoriosSection">
+          <label class="config-label">3. Selecione os Acessórios Opcionais por Categoria:</label>
+          
+          <!-- Categoria 1: Opcionais Sugeridos -->
+          <div class="accessory-category">
+            <div class="accessory-category__title">🌟 Opcionais Sugeridos</div>
+            <div class="accessory-grid" id="gridOpcionaisSugeridos"></div>
+          </div>
+
+          <!-- Categoria 2: Kits Premium -->
+          <div class="accessory-category">
+            <div class="accessory-category__title">💎 Kits Premium</div>
+            <div class="accessory-grid" id="gridKitsPremium"></div>
+          </div>
+
+          <!-- Categoria 3: Opcionais de Serviço -->
+          <div class="accessory-category">
+            <div class="accessory-category__title">🛠️ Opcionais de Serviço</div>
+            <div class="accessory-grid" id="gridOpcionaisServico"></div>
+          </div>
+        </div>
+
+        <!-- Barra Resumo da Configuração -->
+        <div class="config-summary">
+          <div class="summary-info">
+            <span id="summaryConjuntoName">Nenhum conjunto selecionado</span>
+            <span class="summary-badge" id="summaryAcessoriosCount">0 Acessórios Selecionados</span>
+          </div>
+          <div class="summary-total">
+            <span>Valor Total Calculado:</span>
+            <strong id="summaryTotalValue">R$ 0,00</strong>
+          </div>
+        </div>
+      </div>
+
       <!-- Dados da Embarcação -->
       <div class="form-section">
         <div class="form-section__header">
@@ -528,11 +596,11 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=3.0.0"></script>
-<script src="js/contracts/atv-utv.js?v=3.0.0"></script>
-<script src="js/contracts/nautico.js?v=3.0.0"></script>
-<script src="js/pdf-generator.js?v=3.0.0"></script>
-<script src="js/app.js?v=3.0.0"></script>
+<script src="assets/logos.js?v=4.0.0"></script>
+<script src="js/contracts/atv-utv.js?v=4.0.0"></script>
+<script src="js/contracts/nautico.js?v=4.0.0"></script>
+<script src="js/pdf-generator.js?v=4.0.0"></script>
+<script src="js/app.js?v=4.0.0"></script>
 
 </body>
 </html>

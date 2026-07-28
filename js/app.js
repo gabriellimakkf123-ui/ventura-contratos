@@ -35,6 +35,9 @@
 
       // Auto-selecionar 'nautico' por padrão para o formulário já abrir aberto e pronto
       selectCategory('nautico');
+
+      // Inicializar Configurador de Embarcações Ventura
+      initBoatConfigurator();
     } catch (e) {
       console.error('Erro na inicialização:', e);
     }
@@ -588,9 +591,188 @@
     }, 4000);
   }
 
+  // ==================== DADOS DOS MODELOS E ACESSÓRIOS VENTURA ====================
+  const VENTURA_MODELS_DATA = {
+    'V195': {
+      model: 'V195',
+      conjuntos: [
+        { id: 'c1', title: 'V195 = Casco + Montagem + F90 CETL 4T', motor: 'F90 CETL 4T', price: 149900 },
+        { id: 'c2', title: 'V195 = Casco + Montagem + F115 BETL 4T', motor: 'F115 BETL 4T', price: 159990 },
+        { id: 'c3', title: 'V195 = Casco + Montagem + 100 ELPT 4T', motor: '100 ELPT 4T', price: 174900 },
+        { id: 'c4', title: 'V195 = Casco + Montagem + F150 DETL 4T', motor: 'F150 DETL 4T', price: 179990 },
+        { id: 'c5', title: 'V195 = Casco + Montagem + 115 ELPT 4T', motor: '115 ELPT 4T', price: 187900 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'acc_1', name: 'Buzina de Corneta Simples', price: 590 },
+          { id: 'acc_2', name: 'Porta-Varas (2)', price: 640 },
+          { id: 'acc_3', name: 'Sistema de Som (01 CD Player, 04 Alto-Falantes, 01 Antena, 01 Bolha)', price: 1800 },
+          { id: 'acc_4', name: 'Ventura System', price: 14900 },
+          { id: 'acc_5', name: 'Tomada 12 Volts', price: 195 },
+          { id: 'acc_6', name: 'Capota V195 NEW', price: 1980 },
+          { id: 'acc_7', name: 'Buzina de Embutir', price: 450 },
+          { id: 'acc_8', name: 'Bússola', price: 290 },
+          { id: 'acc_9', name: 'Marcador de Combustível', price: 1650 },
+          { id: 'acc_10', name: 'Sistema de Direção Hidráulica - para versão Popa', price: 10900 },
+          { id: 'acc_11', name: 'Suporte de defensas (2 Pares) (V195, V205, V210, V215, V220)', price: 320 },
+          { id: 'acc_12', name: 'GPS 5', price: 5500 },
+          { id: 'acc_13', name: 'Defensas G3 (2 unidades) (V195, V205, V210, V215, V220)', price: 380 },
+          { id: 'acc_14', name: 'Radio VHF com antena e suporte', price: 3200 },
+          { id: 'acc_15', name: 'GPS 7', price: 7950 }
+        ],
+        kitsPremium: [
+          { id: 'acc_16', name: 'Kit Eva', price: 4700 },
+          { id: 'acc_17', name: 'Kit Salvatagem (08 COLETES CLASSE V, 01 ANCORA DF 400, 50 MTS DE CABO, 01 BAND. BRASIL, 01 APITO, 01 EXTINTOR, 01 SUP. DE BOIA NÁUTICA)', price: 3070 },
+          { id: 'acc_18', name: 'Kit churrasqueira (churrasqueira, suporte e pedestal)', price: 4100 }
+        ],
+        opcionaisServico: [
+          { id: 'acc_19', name: 'Carreta Rodoviária de Metal V195 e V205', price: 17200 },
+          { id: 'acc_20', name: 'Lona de cobertura ripstop cor prata', price: 2980 },
+          { id: 'acc_21', name: 'Carreta rodo encalhe de madeira', price: 11900 }
+        ]
+      }
+    }
+  };
+
+  let selectedBoatModel = 'V195';
+  let selectedConjuntoId = 'c1';
+  let selectedAccessoryIds = new Set();
+
+  function formatMoneyBRL(val) {
+    return 'R$ ' + Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function initBoatConfigurator() {
+    try {
+      renderConjuntosGrid();
+      renderAccessoriesGrid();
+      updateConfiguratorUI();
+    } catch (e) {
+      console.error('Erro ao inicializar configurador:', e);
+    }
+  }
+
+  function selectBoatModel(model) {
+    if (!VENTURA_MODELS_DATA[model]) return;
+    selectedBoatModel = model;
+    selectedConjuntoId = VENTURA_MODELS_DATA[model].conjuntos[0].id;
+    selectedAccessoryIds.clear();
+    initBoatConfigurator();
+  }
+
+  function selectBoatConjunto(conjuntoId) {
+    selectedConjuntoId = conjuntoId;
+    renderConjuntosGrid();
+    updateConfiguratorUI();
+  }
+
+  function toggleAccessory(accId) {
+    if (selectedAccessoryIds.has(accId)) {
+      selectedAccessoryIds.delete(accId);
+    } else {
+      selectedAccessoryIds.add(accId);
+    }
+    renderAccessoriesGrid();
+    updateConfiguratorUI();
+  }
+
+  function renderConjuntosGrid() {
+    const grid = document.getElementById('conjuntosGrid');
+    if (!grid) return;
+
+    const data = VENTURA_MODELS_DATA[selectedBoatModel];
+    if (!data) return;
+
+    let html = '';
+    data.conjuntos.forEach(c => {
+      const activeClass = c.id === selectedConjuntoId ? 'active' : '';
+      html += `
+        <div class="conjunto-card ${activeClass}" onclick="selectBoatConjunto('${c.id}')">
+          <div class="conjunto-card__info">
+            <div class="conjunto-card__radio"></div>
+            <span class="conjunto-card__title">${c.title}</span>
+          </div>
+          <span class="conjunto-card__price">${formatMoneyBRL(c.price)}</span>
+        </div>
+      `;
+    });
+    grid.innerHTML = html;
+  }
+
+  function renderAccessoriesGrid() {
+    const data = VENTURA_MODELS_DATA[selectedBoatModel];
+    if (!data) return;
+
+    renderCategoryGroup('gridOpcionaisSugeridos', data.acessorios.opcionaisSugeridos);
+    renderCategoryGroup('gridKitsPremium', data.acessorios.kitsPremium);
+    renderCategoryGroup('gridOpcionaisServico', data.acessorios.opcionaisServico);
+  }
+
+  function renderCategoryGroup(gridId, items) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+
+    let html = '';
+    items.forEach(acc => {
+      const isSelected = selectedAccessoryIds.has(acc.id);
+      const selClass = isSelected ? 'selected' : '';
+      const checkedAttr = isSelected ? 'checked' : '';
+      html += `
+        <div class="accessory-item ${selClass}" onclick="toggleAccessory('${acc.id}')">
+          <div class="accessory-item__left">
+            <input type="checkbox" class="accessory-item__checkbox" ${checkedAttr} onclick="event.stopPropagation(); toggleAccessory('${acc.id}');">
+            <span class="accessory-item__name">${acc.name}</span>
+          </div>
+          <span class="accessory-item__price">${formatMoneyBRL(acc.price)}</span>
+        </div>
+      `;
+    });
+    grid.innerHTML = html;
+  }
+
+  function updateConfiguratorUI() {
+    const data = VENTURA_MODELS_DATA[selectedBoatModel];
+    if (!data) return;
+
+    const conjunto = data.conjuntos.find(c => c.id === selectedConjuntoId) || data.conjuntos[0];
+    let total = conjunto ? conjunto.price : 0;
+
+    let allAccessories = [
+      ...data.acessorios.opcionaisSugeridos,
+      ...data.acessorios.kitsPremium,
+      ...data.acessorios.opcionaisServico
+    ];
+
+    let chosenAccessories = [];
+    allAccessories.forEach(acc => {
+      if (selectedAccessoryIds.has(acc.id)) {
+        total += acc.price;
+        chosenAccessories.push(acc.name);
+      }
+    });
+
+    // Atualizar barra de resumo
+    const summaryConjunto = document.getElementById('summaryConjuntoName');
+    const summaryCount = document.getElementById('summaryAcessoriosCount');
+    const summaryTotal = document.getElementById('summaryTotalValue');
+
+    if (summaryConjunto) summaryConjunto.textContent = conjunto ? conjunto.title : '';
+    if (summaryCount) summaryCount.textContent = `${chosenAccessories.length} Acessórios Selecionados`;
+    if (summaryTotal) summaryTotal.textContent = formatMoneyBRL(total);
+
+    // Preencher campos do formulário náutico
+    setVal('naut-modelo', selectedBoatModel);
+    if (conjunto) setVal('naut-motorizacao', conjunto.motor);
+    setVal('naut-valor-total', formatMoneyBRL(total));
+    setVal('naut-acessorios', chosenAccessories.join(', '));
+  }
+
   // ---- Public VenturaApp API ----
   window.showTab = selectCategory;
   window.selectCategory = selectCategory;
+  window.selectBoatModel = selectBoatModel;
+  window.selectBoatConjunto = selectBoatConjunto;
+  window.toggleAccessory = toggleAccessory;
   window.quickFill = quickFillSampleData;
   window.quickFillSampleData = quickFillSampleData;
   window.clearForm = clearForm;
@@ -604,6 +786,9 @@
 
   window.VenturaApp = {
     selectCategory: selectCategory,
+    selectBoatModel: selectBoatModel,
+    selectBoatConjunto: selectBoatConjunto,
+    toggleAccessory: toggleAccessory,
     quickFill: quickFillSampleData,
     clear: clearForm,
     preview: showPreview,
