@@ -781,12 +781,41 @@
           { id: 'v215_acc_20', name: 'Lona de cobertura V215', price: 4350 }
         ]
       }
+    },
+
+    'V220 SURF': {
+      model: 'V220 SURF',
+      linha: 'Linha Comfort',
+      conjuntos: [
+        { id: 'v220_c1', title: 'V220 Surf = Casco + Motor FWD V6 280 EVC Volvo + Montagem', motor: 'FWD V6 280 EVC Volvo', price: 539990 },
+        { id: 'v220_c2', title: 'V220 Surf = Casco + Motor FWD V8 300 EVC Volvo + Montagem', motor: 'FWD V8 300 EVC Volvo', price: 549990 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'v220_acc_1', name: 'Buzina de Embutir', price: 450 },
+          { id: 'v220_acc_2', name: 'Kit Garfos para Colocação de Pranchas na Targa', price: 5300 },
+          { id: 'v220_acc_3', name: 'Kit Auto-Falantes de Targa', price: 7300 },
+          { id: 'v220_acc_4', name: 'Marcador de Combustível', price: 1650 },
+          { id: 'v220_acc_5', name: 'Sistema de som (01 cd player, 04 alto falantes)', price: 2100 },
+          { id: 'v220_acc_6', name: 'Suporte de defensas (2 Pares) (V195, V205, V210, V215, V220)', price: 320 },
+          { id: 'v220_acc_7', name: 'Bússola', price: 1190 },
+          { id: 'v220_acc_8', name: 'Defensas G3 (2 unidades) (V195, V205, V210, V215, V220)', price: 380 },
+          { id: 'v220_acc_9', name: 'Capota para barco com targa de metal', price: 7300 }
+        ],
+        kitsPremium: [
+          { id: 'v220_acc_10', name: 'Kit Salvatagem (08 COLETES CLASSE V, 01 ANCORA DF 400, 50 MTS DE CABO, 01 BAND. BRASIL, 01 APITO, 01 EXTINTOR, 01 SUP. DE BOIA NÁUTICA)', price: 3070 }
+        ],
+        opcionaisServico: [
+          { id: 'v220_acc_11', name: 'Carreta rodo encalhe de madeira V220 e V250', price: 14500 },
+          { id: 'v220_acc_12', name: 'Lona de cobertura V220 SURF', price: 5500 }
+        ]
+      }
     }
   };
 
   // Registrar todos os modelos de todas as 3 linhas
   [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
-    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort' && m !== 'V215 Cabin Comfort') {
+    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort' && m !== 'V215 Cabin Comfort' && m !== 'V220 SURF') {
       const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
