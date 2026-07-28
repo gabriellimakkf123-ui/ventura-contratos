@@ -592,9 +592,24 @@
   }
 
   // ==================== DADOS DOS MODELOS E ACESSÓRIOS VENTURA ====================
+  const COMFORT_MODELS = [
+    'V195 Comfort - NEW',
+    'V205 CROSSOVER',
+    'V210 Comfort',
+    'V215 Cabin Comfort',
+    'V220 SURF',
+    'V230 GII Comfort',
+    'V250 Comfort',
+    'V250 Sport',
+    'V265 Cabin Comfort',
+    'V300 Crossover',
+    'V300 Day Cruiser'
+  ];
+
   const VENTURA_MODELS_DATA = {
-    'V195': {
-      model: 'V195',
+    'V195 Comfort - NEW': {
+      model: 'V195 Comfort - NEW',
+      linha: 'Linha Comfort',
       conjuntos: [
         { id: 'c1', title: 'V195 = Casco + Montagem + F90 CETL 4T', motor: 'F90 CETL 4T', price: 149900 },
         { id: 'c2', title: 'V195 = Casco + Montagem + F115 BETL 4T', motor: 'F115 BETL 4T', price: 159990 },
@@ -633,6 +648,18 @@
       }
     }
   };
+
+  // Cadastrar modelos genéricos para os outros 10 barcos da Linha Comfort
+  COMFORT_MODELS.forEach(m => {
+    if (m !== 'V195 Comfort - NEW') {
+      VENTURA_MODELS_DATA[m] = {
+        model: m,
+        linha: 'Linha Comfort',
+        conjuntos: [],
+        acessorios: { opcionaisSugeridos: [], kitsPremium: [], opcionaisServico: [] }
+      };
+    }
+  });
 
   let selectedBoatModel = 'V195';
   let selectedConjuntoId = 'c1';
@@ -683,6 +710,15 @@
     const data = VENTURA_MODELS_DATA[selectedBoatModel];
     if (!data) return;
 
+    if (!data.conjuntos || data.conjuntos.length === 0) {
+      grid.innerHTML = `
+        <div style="padding: 12px 16px; font-size: 0.88rem; color: var(--color-accent-light); background: rgba(212, 168, 83, 0.08); border-radius: var(--radius-sm); border: 1px dashed rgba(212, 168, 83, 0.3);">
+          ℹ️ Modelo <strong>${selectedBoatModel}</strong> selecionado! O nome da embarcação já foi preenchido automaticamente. Os conjuntos e acessórios específicos deste barco serão liberados nas próximas etapas.
+        </div>
+      `;
+      return;
+    }
+
     let html = '';
     data.conjuntos.forEach(c => {
       const activeClass = c.id === selectedConjuntoId ? 'active' : '';
@@ -712,6 +748,11 @@
     const grid = document.getElementById(gridId);
     if (!grid) return;
 
+    if (!items || items.length === 0) {
+      grid.innerHTML = `<span style="font-size: 0.82rem; color: var(--color-text-muted);">Disponível em breve</span>`;
+      return;
+    }
+
     let html = '';
     items.forEach(acc => {
       const isSelected = selectedAccessoryIds.has(acc.id);
@@ -734,13 +775,22 @@
     const data = VENTURA_MODELS_DATA[selectedBoatModel];
     if (!data) return;
 
+    // Atualizar pills ativas no DOM
+    document.querySelectorAll('.model-pill').forEach(btn => {
+      if (btn.getAttribute('data-model') === selectedBoatModel) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
     const conjunto = data.conjuntos.find(c => c.id === selectedConjuntoId) || data.conjuntos[0];
     let total = conjunto ? conjunto.price : 0;
 
     let allAccessories = [
-      ...data.acessorios.opcionaisSugeridos,
-      ...data.acessorios.kitsPremium,
-      ...data.acessorios.opcionaisServico
+      ...(data.acessorios.opcionaisSugeridos || []),
+      ...(data.acessorios.kitsPremium || []),
+      ...(data.acessorios.opcionaisServico || [])
     ];
 
     let chosenAccessories = [];
@@ -756,15 +806,15 @@
     const summaryCount = document.getElementById('summaryAcessoriosCount');
     const summaryTotal = document.getElementById('summaryTotalValue');
 
-    if (summaryConjunto) summaryConjunto.textContent = conjunto ? conjunto.title : '';
+    if (summaryConjunto) summaryConjunto.textContent = conjunto ? conjunto.title : selectedBoatModel;
     if (summaryCount) summaryCount.textContent = `${chosenAccessories.length} Acessórios Selecionados`;
-    if (summaryTotal) summaryTotal.textContent = formatMoneyBRL(total);
+    if (summaryTotal) summaryTotal.textContent = total > 0 ? formatMoneyBRL(total) : 'Preenchimento Manual';
 
-    // Preencher campos do formulário náutico
+    // Preencher campos do formulário náutico automaticamente
     setVal('naut-modelo', selectedBoatModel);
     if (conjunto) setVal('naut-motorizacao', conjunto.motor);
-    setVal('naut-valor-total', formatMoneyBRL(total));
-    setVal('naut-acessorios', chosenAccessories.join(', '));
+    if (total > 0) setVal('naut-valor-total', formatMoneyBRL(total));
+    if (chosenAccessories.length > 0) setVal('naut-acessorios', chosenAccessories.join(', '));
   }
 
   // ---- Public VenturaApp API ----
