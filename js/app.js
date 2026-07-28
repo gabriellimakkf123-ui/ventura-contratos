@@ -742,12 +742,51 @@
           { id: 'v210_acc_19', name: 'Capota V210 V215', price: 3013.60 }
         ]
       }
+    },
+
+    'V215 Cabin Comfort': {
+      model: 'V215 Cabin Comfort',
+      linha: 'Linha Comfort',
+      conjuntos: [
+        { id: 'v215_c1', title: 'V215 = Casco + Montagem + F115 BETL 4T Yamaha', motor: 'F115 BETL 4T Yamaha', price: 253500 },
+        { id: 'v215_c2', title: 'V215 = Casco + Montagem + F150 DETL 4T Yamaha', motor: 'F150 DETL 4T Yamaha', price: 276600 },
+        { id: 'v215_c3', title: 'V215 = Casco + Montagem + 115 ELPT 4T Mercury', motor: '115 ELPT 4T Mercury', price: 287900 },
+        { id: 'v215_c4', title: 'V215 = Casco + Montagem + 150 EFI 4T L Mercury', motor: '150 EFI 4T L Mercury', price: 312900 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'v215_acc_1', name: 'Sistema de Som (01 CD Player, 04 Alto-Falantes, 01 Antena, 01 Bolha)', price: 1800 },
+          { id: 'v215_acc_2', name: 'Mastro de Ski', price: 3500 },
+          { id: 'v215_acc_3', name: 'Buzina de Corneta Simples', price: 590 },
+          { id: 'v215_acc_4', name: 'Buzina de Embutir', price: 450 },
+          { id: 'v215_acc_5', name: 'Ventilador de Cabine (2)', price: 840 },
+          { id: 'v215_acc_6', name: 'Bússola', price: 290 },
+          { id: 'v215_acc_7', name: 'Marcador de Combustível', price: 1650 },
+          { id: 'v215_acc_8', name: 'Sistema de Direção Hidráulica - para versão Popa', price: 10900 },
+          { id: 'v215_acc_9', name: 'Suporte de defensas (2 Pares) (V195, V205, V210, V215, V220)', price: 320 },
+          { id: 'v215_acc_10', name: 'GPS 5', price: 5500 },
+          { id: 'v215_acc_11', name: 'Defensas G3 (2 unidades) (V195, V205, V210, V215, V220)', price: 380 },
+          { id: 'v215_acc_12', name: 'Radio VHF com antena e suporte', price: 3200 },
+          { id: 'v215_acc_13', name: 'GPS 7', price: 7950 }
+        ],
+        kitsPremium: [
+          { id: 'v215_acc_14', name: 'Kit Eva', price: 4700 },
+          { id: 'v215_acc_15', name: 'Kit TV (TV 12v com Entrada USB e Antena)', price: 4200 },
+          { id: 'v215_acc_16', name: 'Kit Salvatagem (08 COLETES CLASSE V, 01 ANCORA DF 400, 50 MTS DE CABO, 01 BAND. BRASIL, 01 APITO, 01 EXTINTOR, 01 SUP. DE BOIA NÁUTICA)', price: 3070 },
+          { id: 'v215_acc_17', name: 'Kit churrasqueira (churrasqueira, suporte e pedestal)', price: 4100 }
+        ],
+        opcionaisServico: [
+          { id: 'v215_acc_18', name: 'Capota V210 V215', price: 3013.60 },
+          { id: 'v215_acc_19', name: 'Carreta rodo encalhe de madeira v215', price: 12200 },
+          { id: 'v215_acc_20', name: 'Lona de cobertura V215', price: 4350 }
+        ]
+      }
     }
   };
 
   // Registrar todos os modelos de todas as 3 linhas
   [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
-    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort') {
+    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort' && m !== 'V215 Cabin Comfort') {
       const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
