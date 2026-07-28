@@ -704,12 +704,50 @@
           { id: 'v205_acc_24', name: 'Carreta rodo encalhe de madeira', price: 11900 }
         ]
       }
+    },
+
+    'V210 Comfort': {
+      model: 'V210 Comfort',
+      linha: 'Linha Comfort',
+      conjuntos: [
+        { id: 'v210_c1', title: 'V210 = Casco + Montagem + F115 BETL 4T Yamaha', motor: 'F115 BETL 4T Yamaha', price: 242500 },
+        { id: 'v210_c2', title: 'V210 = Casco + Montagem + F150 DETL 4T Yamaha', motor: 'F150 DETL 4T Yamaha', price: 265500 },
+        { id: 'v210_c3', title: 'V210 = Casco + Montagem + 115 ELPT 4T Mercury', motor: '115 ELPT 4T Mercury', price: 268900 },
+        { id: 'v210_c4', title: 'V210 = Casco + Montagem + 150 EFI 4T L Mercury', motor: '150 EFI 4T L Mercury', price: 293900 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'v210_acc_1', name: 'Sistema de Som (01 CD Player, 04 Alto-Falantes, 01 Antena, 01 Bolha)', price: 1800 },
+          { id: 'v210_acc_2', name: 'Mastro de Ski', price: 3500 },
+          { id: 'v210_acc_3', name: 'Buzina de Corneta Simples', price: 590 },
+          { id: 'v210_acc_4', name: 'Buzina de Embutir', price: 450 },
+          { id: 'v210_acc_5', name: 'Bússola', price: 290 },
+          { id: 'v210_acc_6', name: 'Marcador de Combustível', price: 1650 },
+          { id: 'v210_acc_7', name: 'Sistema de Direção Hidráulica - para versão Popa', price: 10900 },
+          { id: 'v210_acc_8', name: 'Suporte de defensas (2 Pares) (V195, V205, V210, V215, V220)', price: 320 },
+          { id: 'v210_acc_9', name: 'GPS 5', price: 5500 },
+          { id: 'v210_acc_10', name: 'Defensas G3 (2 unidades) (V195, V205, V210, V215, V220)', price: 380 },
+          { id: 'v210_acc_11', name: 'Radio VHF com antena e suporte', price: 3200 },
+          { id: 'v210_acc_12', name: 'GPS 7', price: 7950 }
+        ],
+        kitsPremium: [
+          { id: 'v210_acc_13', name: 'Kit EVA', price: 5900 },
+          { id: 'v210_acc_14', name: 'Kit Salvatagem (09 Coletes Classe V, 01 Âncora DF 400, 50 Mts de Cabo, 01 Bandeira do Brasil, 01 Apito, 01 Extintor, 01 Sup. Boia)', price: 3100 },
+          { id: 'v210_acc_15', name: 'Kit churrasqueira (churrasqueira, suporte e pedestal)', price: 4100 }
+        ],
+        opcionaisServico: [
+          { id: 'v210_acc_16', name: 'Carreta Rodoviária de Metal V195 e V205', price: 17200 },
+          { id: 'v210_acc_17', name: 'Carreta rodo encalhe de madeira', price: 11900 },
+          { id: 'v210_acc_18', name: 'Lona de cobertura V210', price: 4200 },
+          { id: 'v210_acc_19', name: 'Capota V210 V215', price: 3013.60 }
+        ]
+      }
     }
   };
 
   // Registrar todos os modelos de todas as 3 linhas
   [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
-    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER') {
+    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort') {
       const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
