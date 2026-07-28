@@ -810,12 +810,48 @@
           { id: 'v220_acc_12', name: 'Lona de cobertura V220 SURF', price: 5500 }
         ]
       }
+    },
+
+    'V230 GII Comfort': {
+      model: 'V230 GII Comfort',
+      linha: 'Linha Comfort',
+      conjuntos: [
+        { id: 'v230_c1', title: 'V230 = Casco + Montagem + 225 V6 XL Mercury', motor: '225 V6 XL Mercury', price: 377900 },
+        { id: 'v230_c2', title: 'V230 = Casco + Montagem + F200 QETX 4T (CINZA)', motor: 'F200 QETX 4T (CINZA)', price: 327900 },
+        { id: 'v230_c3', title: 'V230 = Casco + Montagem + F250 LETX 4T (CINZA)', motor: 'F250 LETX 4T (CINZA)', price: 335900 },
+        { id: 'v230_c4', title: 'V230 = Casco + Montagem + 200 V6 XL Mercury', motor: '200 V6 XL Mercury', price: 369900 }
+      ],
+      acessorios: {
+        opcionaisSugeridos: [
+          { id: 'v230_acc_1', name: 'Buzina de Embutir', price: 450 },
+          { id: 'v230_acc_2', name: 'Buzina de Corneta Simples', price: 590 },
+          { id: 'v230_acc_3', name: 'Sistema de Som (01 CD Player, 04 Alto-Falantes, 01 Antena, 01 Bolha)', price: 2066 },
+          { id: 'v230_acc_4', name: 'GPS 7', price: 7355 },
+          { id: 'v230_acc_5', name: 'Rádio VHF com Antena e Suporte', price: 3198 },
+          { id: 'v230_acc_6', name: 'Capota', price: 4350 },
+          { id: 'v230_acc_7', name: 'Defensas G3 (3 Unidades)', price: 636 },
+          { id: 'v230_acc_8', name: 'Bússola', price: 289 },
+          { id: 'v230_acc_9', name: 'Suporte de Defensas (3)', price: 479 },
+          { id: 'v230_acc_10', name: 'GPS 5', price: 5891 },
+          { id: 'v230_acc_11', name: 'Sistema de Direção Hidráulica', price: 10900 },
+          { id: 'v230_acc_12', name: 'Marcador de Combustível', price: 1495 }
+        ],
+        kitsPremium: [
+          { id: 'v230_acc_13', name: 'Kit Churrasqueira (Churrasqueira, Suporte e Pedestal)', price: 4083 },
+          { id: 'v230_acc_14', name: 'Kit Salvatagem (10 Coletes Classe V, 01 Âncora DF 500, 50 Mts de Cabo, 01 Bandeira do Brasil, 01 Apito, 01 Extintor, 01 Sup. Boia)', price: 3173 },
+          { id: 'v230_acc_15', name: 'Kit EVA', price: 4735 }
+        ],
+        opcionaisServico: [
+          { id: 'v230_acc_16', name: 'Lona de Cobertura', price: 4686 },
+          { id: 'v230_acc_17', name: 'Carreta Rodo-Encalhe de Madeira — Carreta Rodo-Encalhe de Madeira', price: 11900 }
+        ]
+      }
     }
   };
 
   // Registrar todos os modelos de todas as 3 linhas
   [...COMFORT_MODELS, ...PREMIUM_MODELS, ...PONTOON_MODELS].forEach(m => {
-    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort' && m !== 'V215 Cabin Comfort' && m !== 'V220 SURF') {
+    if (m !== 'V195 Comfort - NEW' && m !== 'V205 CROSSOVER' && m !== 'V210 Comfort' && m !== 'V215 Cabin Comfort' && m !== 'V220 SURF' && m !== 'V230 GII Comfort') {
       const linha = COMFORT_MODELS.includes(m) ? 'Linha Comfort' : (PREMIUM_MODELS.includes(m) ? 'Linha Premium' : 'Pontoon Series');
       VENTURA_MODELS_DATA[m] = {
         model: m,
