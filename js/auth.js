@@ -198,15 +198,33 @@
   }
 
   function updateUserPassword(userId, newPin) {
-    if (!newPin || !newPin.trim()) {
-      return { success: false, message: 'A nova senha não pode ser vazia.' };
-    }
+    return updateUserCredentials(userId, { pin: newPin });
+  }
+
+  function updateUserCredentials(userId, updates) {
+    updates = updates || {};
     try {
       const users = getAllUsers();
       const user = users.find(u => u.id === userId);
       if (!user) return { success: false, message: 'Usuário não encontrado.' };
 
-      user.pin = newPin.trim();
+      if (updates.email && updates.email.trim()) {
+        const cleanEmail = updates.email.trim().toLowerCase();
+        const dup = users.find(u => u.id !== userId && u.email && u.email.toLowerCase() === cleanEmail);
+        if (dup) {
+          return { success: false, message: 'Este e-mail já está sendo utilizado por outro usuário.' };
+        }
+        user.email = cleanEmail;
+      }
+      if (updates.pin && updates.pin.trim()) {
+        user.pin = updates.pin.trim();
+      }
+      if (updates.name && updates.name.trim()) {
+        user.name = updates.name.trim();
+      }
+      if (updates.phone !== undefined) {
+        user.phone = updates.phone.trim();
+      }
 
       const stored = localStorage.getItem(STORAGE_KEY_CUSTOM_USERS);
       let custom = stored ? JSON.parse(stored) : [];
@@ -221,13 +239,14 @@
       // Atualizar currentUser se for o mesmo
       const current = getCurrentUser();
       if (current && current.id === userId) {
-        current.pin = newPin.trim();
+        Object.assign(current, user);
         localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(current));
+        window.dispatchEvent(new CustomEvent('ventura:auth_change', { detail: { user: current } }));
       }
 
-      return { success: true, message: 'Senha atualizada com sucesso!' };
+      return { success: true, user: user, message: 'Credenciais atualizadas com sucesso!' };
     } catch (e) {
-      return { success: false, message: 'Erro ao salvar nova senha.' };
+      return { success: false, message: 'Erro ao salvar credenciais: ' + e.message };
     }
   }
 
@@ -239,7 +258,8 @@
     isApprover: isApprover,
     isSeller: isSeller,
     registerNewSeller: registerNewSeller,
-    updateUserPassword: updateUserPassword
+    updateUserPassword: updateUserPassword,
+    updateUserCredentials: updateUserCredentials
   };
 
 })();

@@ -1647,6 +1647,42 @@ body::before {
   gap: 16px;
 }
 
+/* ---- Drawer Filter Tabs ---- */
+.drawer-filter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+}
+
+.drawer-tab-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.drawer-tab-btn:hover {
+  border-color: var(--color-accent);
+  color: #FFF;
+  background: rgba(212, 168, 83, 0.1);
+}
+
+.drawer-tab-btn.active {
+  background: rgba(212, 168, 83, 0.22);
+  border-color: var(--color-accent);
+  color: var(--color-accent-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
 /* ---- Cards de Proposta no Drawer ---- */
 .proposal-card {
   background: rgba(16, 32, 58, 0.65);

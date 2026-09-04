@@ -95,8 +95,13 @@
         <span class="nav-counter-badge approved-badge" id="badgeMyContractsCount">0</span>
       </button>
 
+      <!-- Botão Configurações da Conta -->
+      <button type="button" class="btn-booth-nav" id="btnOpenAccountSettings" onclick="openAccountSettingsModal()" title="Configurar meu login e senha">
+        <span>⚙️ Configurar Acesso</span>
+      </button>
+
       <!-- Botão Sair / Trocar de Consultor -->
-      <button type="button" class="btn-logout" onclick="VenturaAuth.logout()" title="Trocar de consultor no tablet">
+      <button type="button" class="btn-logout" onclick="VenturaAuth.logout()" title="Sair do sistema">
         🚪 Sair
       </button>
     </div>
@@ -118,6 +123,20 @@
         <div style="font-size: 0.82rem; color: var(--color-text-muted); background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: var(--radius-full); border: 1px solid rgba(255,255,255,0.08);">
           📍 Estande Ventura Marine — Boat Show 2026
         </div>
+      </div>
+
+      <!-- Banner Especial da Diretoria (Aparece para Carlos Renato, André, Marcos) -->
+      <div id="approverBanner" style="display: none; background: linear-gradient(135deg, rgba(212, 168, 83, 0.22), rgba(16, 32, 58, 0.9)); border: 1.5px solid rgba(212, 168, 83, 0.6); border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.8rem;">👑</span>
+          <div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #FFF;">Painel da Diretoria: <span id="bannerPendingNumber" style="color: #FBBF24; font-size: 1.15rem;">0</span> proposta(s) aguardando sua aprovação</div>
+            <div style="font-size: 0.78rem; color: var(--color-text-muted);">Carlos Renato, André e Marcos: clique para avaliar, aprovar ou solicitar ajustes</div>
+          </div>
+        </div>
+        <button type="button" class="btn-booth-nav approvals-btn" onclick="openApprovalsDrawer()" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #D4A853, #92722A); color: #0A1628;">
+          <span>👑 Abrir Fila de Aprovações (<span id="bannerBtnCount">0</span>)</span>
+        </button>
       </div>
 
       <!-- Dados do Comprador -->
@@ -522,14 +541,6 @@
       <button type="button" class="btn-enter-booth" id="btnDoLogin" onclick="handleEmailLoginClick()">
         <span>🚀 Entrar no Sistema</span>
       </button>
-
-      <!-- Acesso Rápido Discreto para o Estande / Demonstração -->
-      <div class="quick-access-box">
-        <div class="quick-access-title">Ou selecione seu usuário para preenchimento rápido:</div>
-        <div class="quick-chips-grid" id="quickChipsGrid">
-          <!-- Gerado via JS: Carlos Renato, André, Marcos, Consultores -->
-        </div>
-      </div>
     </div>
 
     <!-- Painel: Criar Acesso / Novo Consultor -->
@@ -565,17 +576,58 @@
   </div>
 </div>
 
+<!-- ==================== MODAL: CONFIGURAÇÕES DA CONTA ==================== -->
+<div class="signature-modal" id="accountSettingsModal" style="display: none;">
+  <div class="signature-modal-pane" style="max-width: 480px;">
+    <div class="signature-modal-header">
+      <h3 style="display: flex; align-items: center; gap: 8px;"><span>⚙️</span> Configurações de Acesso</h3>
+      <button type="button" class="drawer-close-btn" onclick="closeAccountSettingsModal()">✕ Fechar</button>
+    </div>
+    <div style="padding: 20px 24px;">
+      <div style="margin-bottom: 16px; background: rgba(212, 168, 83, 0.1); border: 1px solid rgba(212, 168, 83, 0.3); border-radius: var(--radius-sm); padding: 12px 16px;">
+        <div style="font-size: 0.75rem; color: var(--color-accent-light); font-weight: 700; text-transform: uppercase;">Usuário Conectado:</div>
+        <div style="font-size: 1.05rem; font-weight: 800; color: #FFF; margin-top: 2px;" id="settingsUserNameDisplay">—</div>
+        <div style="font-size: 0.8rem; color: var(--color-text-muted);" id="settingsUserRoleDisplay">—</div>
+      </div>
+
+      <div class="form-group-login">
+        <label for="settingsEmailInput">E-mail de Login:</label>
+        <input type="email" id="settingsEmailInput" class="login-input" placeholder="seu-email@ventura.com.br">
+      </div>
+
+      <div class="form-group-login">
+        <label for="settingsPasswordInput">Nova Senha de Acesso (PIN):</label>
+        <input type="password" id="settingsPasswordInput" class="login-input" placeholder="Digite uma nova senha">
+      </div>
+
+      <div class="form-group-login">
+        <label for="settingsPhoneInput">Telefone / WhatsApp:</label>
+        <input type="text" id="settingsPhoneInput" class="login-input" placeholder="(00) 00000-0000">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn-clear-sig" onclick="closeAccountSettingsModal()" style="flex: 1;">
+          Cancelar
+        </button>
+        <button type="button" class="btn-sign-now" onclick="saveAccountSettings()" style="flex: 1.5;">
+          <span>💾 Salvar Alterações</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== TOAST ==================== -->
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=6.1.0"></script>
-<script src="js/auth.js?v=6.1.0"></script>
-<script src="js/contracts-db.js?v=6.1.0"></script>
-<script src="js/signature.js?v=6.1.0"></script>
-<script src="js/contracts/nautico.js?v=6.1.0"></script>
-<script src="js/pdf-generator.js?v=6.1.0"></script>
-<script src="js/app.js?v=6.1.0"></script>
+<script src="assets/logos.js?v=6.2.0"></script>
+<script src="js/auth.js?v=6.2.0"></script>
+<script src="js/contracts-db.js?v=6.2.0"></script>
+<script src="js/signature.js?v=6.2.0"></script>
+<script src="js/contracts/nautico.js?v=6.2.0"></script>
+<script src="js/pdf-generator.js?v=6.2.0"></script>
+<script src="js/app.js?v=6.2.0"></script>
 
 </body>
 </html>

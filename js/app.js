@@ -324,6 +324,19 @@
     if (boxEl) boxEl.classList.remove('visible');
   }
 
+  function validateForm(category) {
+    const isValid = validateAndExplain(category);
+    if (!isValid) {
+      const firstErr = document.querySelector('#formNautico .form-group.error, #formAtv .form-group.error');
+      if (firstErr) {
+        firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = firstErr.querySelector('input, select, textarea');
+        if (input) input.focus();
+      }
+    }
+    return isValid;
+  }
+
   // ---- Preenchimento Rápido (Dados de Teste) ----
   function quickFillSampleData(category) {
     try {
@@ -1143,15 +1156,18 @@
     const btnApprovals = document.getElementById('btnOpenApprovals');
     const btnSubmit = document.getElementById('btnSubmitApproval');
     const btnDirect = document.getElementById('btnDirectApprove');
+    const approverBanner = document.getElementById('approverBanner');
 
     if (user.role === 'approver') {
       if (btnApprovals) btnApprovals.style.display = 'inline-flex';
       if (btnDirect) btnDirect.style.display = 'inline-flex';
-      if (btnSubmit) btnSubmit.style.display = 'none';
+      if (btnSubmit) btnSubmit.style.display = 'inline-flex'; // Diretoria também pode submeter propostas para testes
+      if (approverBanner) approverBanner.style.display = 'flex';
     } else {
       if (btnApprovals) btnApprovals.style.display = 'none';
       if (btnDirect) btnDirect.style.display = 'none';
       if (btnSubmit) btnSubmit.style.display = 'inline-flex';
+      if (approverBanner) approverBanner.style.display = 'none';
     }
 
     updateCounters();
@@ -1163,31 +1179,19 @@
 
     const badgeApprovals = document.getElementById('badgeApprovalsCount');
     const badgeMyContracts = document.getElementById('badgeMyContractsCount');
+    const bannerPendingNumber = document.getElementById('bannerPendingNumber');
+    const bannerBtnCount = document.getElementById('bannerBtnCount');
 
     if (badgeApprovals) badgeApprovals.textContent = pendingCount;
     if (badgeMyContracts) badgeMyContracts.textContent = myCount;
+    if (bannerPendingNumber) bannerPendingNumber.textContent = pendingCount;
+    if (bannerBtnCount) bannerBtnCount.textContent = pendingCount;
   }
 
   function renderLoginUsers() {
-    const users = window.VenturaAuth ? window.VenturaAuth.getAllUsers() : [];
+    // Tela de login limpa e sigilosa sem expor lista de aprovadores/diretoria
     const quickChipsGrid = document.getElementById('quickChipsGrid');
-
-    if (!quickChipsGrid) return;
-
-    quickChipsGrid.innerHTML = '';
-
-    users.forEach(u => {
-      const avatarClass = u.role === 'approver' ? 'approver' : '';
-      const chip = document.createElement('div');
-      chip.className = 'quick-chip';
-      chip.title = `Entrar como ${u.name} (${u.email})`;
-      chip.onclick = function() { fillQuickUser(u.email || u.username, u.pin || '1234'); };
-      chip.innerHTML = `
-        <div class="quick-chip-avatar ${avatarClass}">${u.avatar || u.name.slice(0, 2).toUpperCase()}</div>
-        <span>${u.name}</span>
-      `;
-      quickChipsGrid.appendChild(chip);
-    });
+    if (quickChipsGrid) quickChipsGrid.innerHTML = '';
   }
 
   function fillQuickUser(identifier, pin) {
@@ -1281,16 +1285,22 @@
   // ---- Submissão de Propostas ----
   function submitProposalForApproval() {
     if (!validateForm('nautico')) {
-      showToast('⚠️ Preencha os campos obrigatórios em destaque!');
+      showToast('⚠️ Preencha os campos obrigatórios em destaque!', 'error');
       return;
     }
 
     const formData = collectFormData('nautico');
-    const res = window.VenturaDB.createProposal(formData);
+    const res = window.VenturaDB.createProposal(formData, { directApprove: false });
 
     if (res.success) {
-      showToast(res.message);
-      openMyContractsDrawer();
+      showToast(res.message, 'success');
+      const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
+      if (user && user.role === 'approver') {
+        openApprovalsDrawer();
+      } else {
+        openMyContractsDrawer();
+      }
+      updateCounters();
     } else {
       alert(res.message);
     }
@@ -1298,22 +1308,30 @@
 
   function createAndDirectApprove() {
     if (!validateForm('nautico')) {
-      showToast('⚠️ Preencha os campos obrigatórios em destaque!');
+      showToast('⚠️ Preencha os campos obrigatórios em destaque!', 'error');
       return;
     }
 
     const formData = collectFormData('nautico');
-    const res = window.VenturaDB.createProposal(formData);
+    const res = window.VenturaDB.createProposal(formData, { directApprove: true });
 
     if (res.success) {
-      showToast('✓ Contrato aprovado pela Diretoria! Abrindo assinatura...');
+      showToast('✓ Contrato aprovado pela Diretoria! Abrindo assinatura...', 'success');
       window.VenturaSignature.openSignatureModal(res.contract.id);
+      updateCounters();
     } else {
       alert(res.message);
     }
   }
 
   // ---- Drawer de Aprovações (Carlos Renato, André, Marcos) ----
+  let currentApprovalFilter = 'pendente';
+
+  function setApprovalFilter(filter) {
+    currentApprovalFilter = filter;
+    renderApprovalsList();
+  }
+
   function openApprovalsDrawer() {
     const drawer = document.getElementById('approvalsDrawer');
     if (drawer) {
@@ -1331,21 +1349,63 @@
     const container = document.getElementById('approvalsListContainer');
     if (!container) return;
 
-    const list = window.VenturaDB ? window.VenturaDB.getContractsForCurrentUser() : [];
+    const all = window.VenturaDB ? window.VenturaDB.getContractsForCurrentUser() : [];
 
-    if (list.length === 0) {
+    if (all.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; padding: 40px 20px; color: var(--color-text-muted);">
           <div style="font-size: 2.5rem; margin-bottom: 12px;">☕</div>
           <h4 style="color: #FFF; margin: 0 0 6px 0;">Nenhuma proposta no momento</h4>
-          <p style="font-size: 0.85rem; margin: 0;">Quando os vendedores enviarem propostas no estande, elas aparecerão aqui em tempo real.</p>
+          <p style="font-size: 0.85rem; margin: 0;">Quando os vendedores enviarem propostas no estande, elas aparecerão aqui em tempo real para Carlos Renato, André e Marcos.</p>
         </div>
       `;
       return;
     }
 
-    let html = '';
-    list.forEach(c => {
+    const countPending = all.filter(c => c.status === 'pendente').length;
+    const countApproved = all.filter(c => c.status === 'aprovado').length;
+    const countSigned = all.filter(c => c.status === 'assinado').length;
+    const countTotal = all.length;
+
+    let filteredList = all;
+    if (currentApprovalFilter === 'pendente') {
+      filteredList = all.filter(c => c.status === 'pendente');
+    } else if (currentApprovalFilter === 'aprovado') {
+      filteredList = all.filter(c => c.status === 'aprovado');
+    } else if (currentApprovalFilter === 'assinado') {
+      filteredList = all.filter(c => c.status === 'assinado');
+    }
+
+    let filterTabsHtml = `
+      <div class="drawer-filter-tabs">
+        <button type="button" class="drawer-tab-btn ${currentApprovalFilter === 'pendente' ? 'active' : ''}" onclick="setApprovalFilter('pendente')">
+          ⏳ Aguardando (${countPending})
+        </button>
+        <button type="button" class="drawer-tab-btn ${currentApprovalFilter === 'aprovado' ? 'active' : ''}" onclick="setApprovalFilter('aprovado')">
+          ✓ Aprovados (${countApproved})
+        </button>
+        <button type="button" class="drawer-tab-btn ${currentApprovalFilter === 'assinado' ? 'active' : ''}" onclick="setApprovalFilter('assinado')">
+          ✍️ Assinados (${countSigned})
+        </button>
+        <button type="button" class="drawer-tab-btn ${currentApprovalFilter === 'todos' ? 'active' : ''}" onclick="setApprovalFilter('todos')">
+          Todos (${countTotal})
+        </button>
+      </div>
+    `;
+
+    if (filteredList.length === 0) {
+      container.innerHTML = filterTabsHtml + `
+        <div style="text-align: center; padding: 30px 16px; color: var(--color-text-muted); background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px dashed rgba(255,255,255,0.1);">
+          <div style="font-size: 1.8rem; margin-bottom: 8px;">🔍</div>
+          <div style="font-size: 0.9rem; color: #FFF; font-weight: 600;">Nenhuma proposta nesta aba</div>
+          <div style="font-size: 0.8rem; margin-top: 4px;">Selecione outra aba acima para visualizar.</div>
+        </div>
+      `;
+      return;
+    }
+
+    let cardsHtml = '';
+    filteredList.forEach(c => {
       const statusMap = {
         'pendente': { label: 'Aguardando Aprovação', cls: 'pending' },
         'aprovado': { label: 'Aprovado', cls: 'approved' },
@@ -1354,7 +1414,7 @@
       };
       const st = statusMap[c.status] || { label: c.status, cls: 'pending' };
 
-      html += `
+      cardsHtml += `
         <div class="proposal-card">
           <div class="proposal-card-header">
             <div class="proposal-id">
@@ -1382,6 +1442,12 @@
             </div>
           </div>
 
+          ${c.dados.acessorios ? `
+            <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 10px; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: var(--radius-sm);">
+              <span style="color: var(--color-accent-light); font-weight: 700;">Acessórios:</span> ${c.dados.acessorios}
+            </div>
+          ` : ''}
+
           <div class="proposal-total-row">
             <span style="font-size: 0.85rem; color: var(--color-text-muted);">Valor Total Negociado:</span>
             <span class="proposal-total-price">${c.dados.valorTotal || 'R$ 0,00'}</span>
@@ -1395,15 +1461,26 @@
               <button type="button" class="btn-reject-action" onclick="rejectProposalItem('${c.id}')">
                 ✕ Solicitar Ajuste
               </button>
+              <button type="button" class="btn-download-signed" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #FFF; width: 100%; margin-top: 6px;" onclick="generatePDFFromContractId('${c.id}')">
+                👁️ Visualizar Prévia em PDF
+              </button>
             </div>
           ` : (c.status === 'aprovado' ? `
-            <div style="font-size: 0.82rem; color: #34D399; font-weight: 600;">
-              ✓ Aprovado por ${c.aprovadoPor} • Aguardando vendedor coletar assinatura do cliente.
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 0.82rem; color: #34D399; font-weight: 600;">
+                ✓ Aprovado por ${c.aprovadoPor} • Aguardando vendedor coletar assinatura do cliente.
+              </div>
+              <button type="button" class="btn-download-signed" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #FFF;" onclick="generatePDFFromContractId('${c.id}')">
+                📄 Baixar Proposta Aprovada (PDF)
+              </button>
             </div>
           ` : (c.status === 'assinado' ? `
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 0.82rem; color: #60A5FA; font-weight: 600;">
+                ✓ Assinado pelo cliente em ${c.assinadoEm ? new Date(c.assinadoEm).toLocaleDateString('pt-BR') : ''}
+              </div>
               <button type="button" class="btn-download-signed" onclick="generatePDFFromContractId('${c.id}')">
-                📄 Baixar Contrato Oficial Assinado
+                📄 Baixar Contrato Oficial Assinado (PDF)
               </button>
             </div>
           ` : `
@@ -1415,15 +1492,19 @@
       `;
     });
 
-    container.innerHTML = html;
+    container.innerHTML = filterTabsHtml + cardsHtml;
   }
 
   function approveProposalItem(id) {
     const user = window.VenturaAuth.getCurrentUser();
+    if (!user) return;
     const notes = prompt('Observação da aprovação (opcional):', 'Condição comercial aprovada pela Diretoria');
+    if (notes === null) return;
     const res = window.VenturaDB.approveProposal(id, user.name, notes);
     if (res.success) {
-      showToast(res.message);
+      showToast(res.message, 'success');
+      renderApprovalsList();
+      updateCounters();
     } else {
       alert(res.message);
     }
@@ -1431,11 +1512,78 @@
 
   function rejectProposalItem(id) {
     const user = window.VenturaAuth.getCurrentUser();
+    if (!user) return;
     const reason = prompt('Informe o motivo ou o ajuste necessário para o vendedor:');
-    if (!reason) return;
-    const res = window.VenturaDB.rejectProposal(id, user.name, reason);
+    if (!reason || !reason.trim()) return;
+    const res = window.VenturaDB.rejectProposal(id, user.name, reason.trim());
     if (res.success) {
-      showToast(res.message);
+      showToast(res.message, 'success');
+      renderApprovalsList();
+      updateCounters();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // ---- Modal de Configurações da Conta ----
+  function openAccountSettingsModal() {
+    const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
+    if (!user) return;
+
+    const modal = document.getElementById('accountSettingsModal');
+    const nameDisp = document.getElementById('settingsUserNameDisplay');
+    const roleDisp = document.getElementById('settingsUserRoleDisplay');
+    const emailInput = document.getElementById('settingsEmailInput');
+    const passInput = document.getElementById('settingsPasswordInput');
+    const phoneInput = document.getElementById('settingsPhoneInput');
+
+    if (nameDisp) nameDisp.textContent = user.name;
+    if (roleDisp) roleDisp.textContent = user.roleLabel;
+    if (emailInput) emailInput.value = user.email || '';
+    if (passInput) passInput.value = user.pin || '';
+    if (phoneInput) phoneInput.value = user.phone || '';
+
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeAccountSettingsModal() {
+    const modal = document.getElementById('accountSettingsModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function saveAccountSettings() {
+    const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
+    if (!user) return;
+
+    const emailInput = document.getElementById('settingsEmailInput');
+    const passInput = document.getElementById('settingsPasswordInput');
+    const phoneInput = document.getElementById('settingsPhoneInput');
+
+    const newEmail = emailInput ? emailInput.value.trim() : '';
+    const newPass = passInput ? passInput.value.trim() : '';
+    const newPhone = phoneInput ? phoneInput.value.trim() : '';
+
+    if (!newEmail) {
+      alert('Informe um e-mail válido para seu login.');
+      if (emailInput) emailInput.focus();
+      return;
+    }
+    if (!newPass) {
+      alert('A senha não pode ser vazia.');
+      if (passInput) passInput.focus();
+      return;
+    }
+
+    const res = window.VenturaAuth.updateUserCredentials(user.id, {
+      email: newEmail,
+      pin: newPass,
+      phone: newPhone
+    });
+
+    if (res.success) {
+      showToast('✓ Suas credenciais foram atualizadas com sucesso!', 'success');
+      closeAccountSettingsModal();
+      updateAuthUI();
     } else {
       alert(res.message);
     }
@@ -1628,6 +1776,12 @@
   window.generatePDFFromContractId = generatePDFFromContractId;
   window.generatePDFFromContract = generatePDFFromContract;
 
+  window.validateForm = validateForm;
+  window.setApprovalFilter = setApprovalFilter;
+  window.openAccountSettingsModal = openAccountSettingsModal;
+  window.closeAccountSettingsModal = closeAccountSettingsModal;
+  window.saveAccountSettings = saveAccountSettings;
+
   window.VenturaApp = {
     selectCategory: selectCategory,
     selectBoatModel: selectBoatModel,
@@ -1638,7 +1792,8 @@
     preview: showPreview,
     closePreview: hidePreview,
     generate: generatePDF,
-    generateBoletoSchedule: generateBoletoSchedule
+    generateBoletoSchedule: generateBoletoSchedule,
+    validateForm: validateForm
   };
 
   // ---- Iniciar quando DOM estiver pronto ----

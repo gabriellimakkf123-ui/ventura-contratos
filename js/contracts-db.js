@@ -27,7 +27,15 @@
     }
   }
 
-  function createProposal(formData) {
+  // Sincronização em tempo real entre abas do navegador
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY_CONTRACTS) {
+      window.dispatchEvent(new CustomEvent('ventura:contracts_change'));
+    }
+  });
+
+  function createProposal(formData, options) {
+    options = options || {};
     const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
     if (!user) {
       return { success: false, message: 'Usuário não autenticado.' };
@@ -36,8 +44,8 @@
     const list = _loadAll();
     const id = 'BS-' + new Date().getFullYear() + '-' + (list.length + 1).toString().padStart(4, '0');
     
-    // Se o próprio criador for Aprovador (Carlos, André, Marcos), já nasce aprovado
-    const isSelfApprover = user.role === 'approver';
+    // Se explicitamente solicitado aprovação direta pela diretoria
+    const isDirectApproved = options.directApprove === true && user.role === 'approver';
 
     const newContract = {
       id: id,
@@ -50,10 +58,10 @@
       evento: formData.evento || 'Boat Show 2026',
       
       // Status: 'pendente' | 'aprovado' | 'rejeitado' | 'assinado'
-      status: isSelfApprover ? 'aprovado' : 'pendente',
-      aprovadoPor: isSelfApprover ? user.name : null,
-      aprovadoEm: isSelfApprover ? new Date().toISOString() : null,
-      aprovacaoNotas: isSelfApprover ? 'Criado diretamente pela Diretoria' : '',
+      status: isDirectApproved ? 'aprovado' : 'pendente',
+      aprovadoPor: isDirectApproved ? user.name : null,
+      aprovadoEm: isDirectApproved ? new Date().toISOString() : null,
+      aprovacaoNotas: isDirectApproved ? 'Criado diretamente pela Diretoria' : '',
       
       motivoRejeicao: null,
       rejeitadoPor: null,
@@ -73,9 +81,9 @@
     return {
       success: true,
       contract: newContract,
-      message: isSelfApprover 
+      message: isDirectApproved 
         ? 'Contrato criado e aprovado pela Diretoria!' 
-        : 'Proposta enviada para aprovação da Diretoria (Carlos Renato, André e Marcos)!'
+        : `Proposta ${id} enviada com sucesso para aprovação da Diretoria (Carlos Renato, André e Marcos)!`
     };
   }
 
