@@ -9,8 +9,9 @@ const VenturaPDF = {
    * @param {Array} blocks - Array de blocos de conteúdo do template
    * @param {string} filename - Nome do arquivo PDF
    * @param {string} category - 'atv' ou 'nautico'
+   * @param {string} [signatureImage] - Assinatura digital em base64
    */
-  generate: function(blocks, filename, category) {
+  generate: function(blocks, filename, category, signatureImage) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({
       orientation: 'portrait',
@@ -173,6 +174,20 @@ const VenturaPDF = {
           pageNum++;
           cursorY = config.marginTop;
           drawHeader();
+        }
+
+        // Se for a linha de assinatura e houver assinatura digital em imagem, desenhar acima da linha
+        if (block.text && block.text.indexOf('________________________________________          ________________________________________') !== -1 && signatureImage && signatureImage.startsWith('data:image')) {
+          try {
+            // Posicionar sobre a coluna direita (Comprador)
+            const sigWidth = 45;
+            const sigHeight = 16;
+            const sigX = config.pageWidth - config.marginRight - sigWidth - 10;
+            const sigY = Math.max(config.marginTop, cursorY - sigHeight + 3);
+            doc.addImage(signatureImage, 'PNG', sigX, sigY, sigWidth, sigHeight);
+          } catch (errSig) {
+            console.warn('Erro ao carregar assinatura digital no PDF:', errSig);
+          }
         }
 
         let color = primaryColor;

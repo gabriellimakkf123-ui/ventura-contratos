@@ -49,12 +49,19 @@ window.VenturaContracts.nautico = function(data) {
   const blocks = [
     // --- TÍTULO ---
     {
-      text: 'CONTRATO DE COMPRA E VENDA DE EMBARCAÇÃO NÁUTICA',
+      text: 'CONTRATO DE COMPRA E VENDA DE EMBARCAÇÃO NÁUTICA — EDIÇÃO BOAT SHOW',
       bold: true,
-      size: 14,
+      size: 13,
       align: 'center',
-      spaceAfter: 10
+      spaceAfter: 4
     },
+    ...(data.contratoId ? [{
+      text: `PROPOSTA / CONTRATO N°: ${data.contratoId}  |  EVENTO: ${data.evento || 'BOAT SHOW 2026'}${data.aprovadoPor ? `  |  APROVADO POR: ${data.aprovadoPor}` : ''}`,
+      bold: true,
+      size: 8.5,
+      align: 'center',
+      spaceAfter: 8
+    }] : []),
     // --- VENDEDOR ---
     {
       text: 'VENDEDOR: COMFORT IND E COMÉRCIO LTDA, com sede na Estrada do Morro Preto S/N KM 01, Zona Rural, Capitólio, Estado de Minas Gerais, CEP 37930-000, inscrita no CNPJ/ME sob o N° 10.215.056/0001-17, doravante denominada VENDEDORA.',
@@ -195,7 +202,7 @@ window.VenturaContracts.nautico = function(data) {
       text: `Capitólio/MG, ${data.dataContrato || '______ de _____________ de ________.'}`,
       align: 'center',
       size: 10,
-      spaceAfter: 30
+      spaceAfter: 20
     },
     {
       text: '________________________________________          ________________________________________',
@@ -211,11 +218,20 @@ window.VenturaContracts.nautico = function(data) {
       spaceAfter: 2
     },
     {
-      text: 'VENDEDORA',
+      text: `VENDEDORA${data.vendedorNome ? ` (Consultor: ${data.vendedorNome})` : ''}             ${data.assinaturaCliente && data.assinaturaCliente !== 'ASSINATURA_FISICA' ? '[DOCUMENTO ASSINADO DIGITALMENTE]' : '[ASSINATURA DO COMPRADOR]'}`,
       align: 'center',
       size: 8.5,
-      spaceAfter: 15
-    }
+      spaceAfter: 12
+    },
+    ...(data.aprovadoPor ? [
+      {
+        text: `✓ APROVADO PELA DIRETORIA: ${data.aprovadoPor}${data.aprovadoEm ? ` em ${new Date(data.aprovadoEm).toLocaleDateString('pt-BR')} às ${new Date(data.aprovadoEm).toLocaleTimeString('pt-BR')}` : ''}`,
+        align: 'center',
+        bold: true,
+        size: 8.5,
+        spaceAfter: 4
+      }
+    ] : [])
   ];
 
   return blocks;

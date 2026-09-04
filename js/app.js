@@ -38,6 +38,9 @@
 
       // Inicializar Configurador de Embarcações Ventura
       initBoatConfigurator();
+
+      // Inicializar Módulo Boat Show & Autenticação
+      initAuthAndBooth();
     } catch (e) {
       console.error('Erro na inicialização:', e);
     }
@@ -1073,6 +1076,478 @@
     if (chosenAccessories.length > 0) setVal('naut-acessorios', chosenAccessories.join(', '));
   }
 
+  // ============================================================
+  // VENTURA BOAT SHOW — SISTEMA DE APROVAÇÕES E ESTANDE
+  // ============================================================
+  let selectedLoginUserId = 'carlos_renato';
+
+  function initAuthAndBooth() {
+    renderLoginUsers();
+    updateAuthUI();
+
+    window.addEventListener('ventura:auth_change', function() {
+      updateAuthUI();
+    });
+
+    window.addEventListener('ventura:contracts_change', function() {
+      updateCounters();
+      const approvalsDrawer = document.getElementById('approvalsDrawer');
+      if (approvalsDrawer && approvalsDrawer.classList.contains('visible')) {
+        renderApprovalsList();
+      }
+      const myContractsDrawer = document.getElementById('myContractsDrawer');
+      if (myContractsDrawer && myContractsDrawer.classList.contains('visible')) {
+        renderMyContractsList();
+      }
+    });
+
+    updateCounters();
+  }
+
+  function updateAuthUI() {
+    const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
+    const loginOverlay = document.getElementById('loginOverlay');
+    const boothTopbar = document.getElementById('boothTopbar');
+    const formNautico = document.getElementById('form-nautico');
+
+    if (!user) {
+      if (loginOverlay) loginOverlay.style.display = 'flex';
+      if (boothTopbar) boothTopbar.style.display = 'none';
+      if (formNautico) formNautico.style.display = 'none';
+      return;
+    }
+
+    if (loginOverlay) loginOverlay.style.display = 'none';
+    if (boothTopbar) boothTopbar.style.display = 'flex';
+    if (formNautico) formNautico.style.display = 'block';
+
+    // Atualizar Topbar
+    const avatarEl = document.getElementById('topbarUserAvatar');
+    const nameEl = document.getElementById('topbarUserName');
+    const roleEl = document.getElementById('topbarUserRole');
+    const consultorDisplay = document.getElementById('displayConsultorNome');
+
+    if (avatarEl) {
+      avatarEl.textContent = user.avatar || user.name.slice(0, 2).toUpperCase();
+      if (user.role === 'approver') {
+        avatarEl.classList.add('approver');
+      } else {
+        avatarEl.classList.remove('approver');
+      }
+    }
+    if (nameEl) nameEl.textContent = user.name;
+    if (roleEl) roleEl.textContent = user.roleLabel;
+    if (consultorDisplay) consultorDisplay.textContent = user.name;
+
+    // Alternar visibilidade de botões por papel
+    const btnApprovals = document.getElementById('btnOpenApprovals');
+    const btnSubmit = document.getElementById('btnSubmitApproval');
+    const btnDirect = document.getElementById('btnDirectApprove');
+
+    if (user.role === 'approver') {
+      if (btnApprovals) btnApprovals.style.display = 'inline-flex';
+      if (btnDirect) btnDirect.style.display = 'inline-flex';
+      if (btnSubmit) btnSubmit.style.display = 'none';
+    } else {
+      if (btnApprovals) btnApprovals.style.display = 'none';
+      if (btnDirect) btnDirect.style.display = 'none';
+      if (btnSubmit) btnSubmit.style.display = 'inline-flex';
+    }
+
+    updateCounters();
+  }
+
+  function updateCounters() {
+    const pendingCount = window.VenturaDB ? window.VenturaDB.getPendingCount() : 0;
+    const myCount = window.VenturaDB ? window.VenturaDB.getContractsForCurrentUser().length : 0;
+
+    const badgeApprovals = document.getElementById('badgeApprovalsCount');
+    const badgeMyContracts = document.getElementById('badgeMyContractsCount');
+
+    if (badgeApprovals) badgeApprovals.textContent = pendingCount;
+    if (badgeMyContracts) badgeMyContracts.textContent = myCount;
+  }
+
+  function renderLoginUsers() {
+    const users = window.VenturaAuth ? window.VenturaAuth.getAllUsers() : [];
+    const approversGrid = document.getElementById('loginApproversGrid');
+    const sellersGrid = document.getElementById('loginSellersGrid');
+
+    if (!approversGrid || !sellersGrid) return;
+
+    approversGrid.innerHTML = '';
+    sellersGrid.innerHTML = '';
+
+    users.forEach(u => {
+      const isActive = u.id === selectedLoginUserId;
+      const activeClass = isActive ? 'active' : '';
+      const avatarClass = u.role === 'approver' ? 'approver' : '';
+      const btn = document.createElement('div');
+      btn.className = `login-user-btn ${activeClass}`;
+      btn.onclick = function() { selectLoginUser(u.id); };
+      btn.innerHTML = `
+        <div class="user-avatar ${avatarClass}">${u.avatar || u.name.slice(0, 2).toUpperCase()}</div>
+        <span>${u.name}</span>
+        <small>${u.role === 'approver' ? 'Diretoria' : 'Consultor'}</small>
+      `;
+
+      if (u.role === 'approver') {
+        approversGrid.appendChild(btn);
+      } else {
+        sellersGrid.appendChild(btn);
+      }
+    });
+  }
+
+  function selectLoginUser(userId) {
+    selectedLoginUserId = userId;
+    renderLoginUsers();
+  }
+
+  function handleLoginClick() {
+    const pinInput = document.getElementById('loginPinInput');
+    const pin = pinInput ? pinInput.value.trim() : '1234';
+
+    if (!selectedLoginUserId) {
+      alert('Selecione um usuário para continuar.');
+      return;
+    }
+
+    const res = window.VenturaAuth.login(selectedLoginUserId, pin);
+    if (res.success) {
+      showToast(`Bem-vindo ao estande, ${res.user.name}!`);
+      updateAuthUI();
+    } else {
+      alert(res.message || 'Erro ao realizar login.');
+    }
+  }
+
+  function promptNewSeller() {
+    const name = prompt('Nome do novo consultor de vendas:');
+    if (!name || !name.trim()) return;
+    const phone = prompt('Telefone / WhatsApp do consultor:');
+    const res = window.VenturaAuth.registerNewSeller(name, phone, '', '1234');
+    if (res.success) {
+      showToast(`Consultor ${name} cadastrado com sucesso!`);
+      selectedLoginUserId = res.user.id;
+      renderLoginUsers();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // ---- Submissão de Propostas ----
+  function submitProposalForApproval() {
+    if (!validateForm('nautico')) {
+      showToast('⚠️ Preencha os campos obrigatórios em destaque!');
+      return;
+    }
+
+    const formData = collectFormData('nautico');
+    const res = window.VenturaDB.createProposal(formData);
+
+    if (res.success) {
+      showToast(res.message);
+      openMyContractsDrawer();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  function createAndDirectApprove() {
+    if (!validateForm('nautico')) {
+      showToast('⚠️ Preencha os campos obrigatórios em destaque!');
+      return;
+    }
+
+    const formData = collectFormData('nautico');
+    const res = window.VenturaDB.createProposal(formData);
+
+    if (res.success) {
+      showToast('✓ Contrato aprovado pela Diretoria! Abrindo assinatura...');
+      window.VenturaSignature.openSignatureModal(res.contract.id);
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // ---- Drawer de Aprovações (Carlos Renato, André, Marcos) ----
+  function openApprovalsDrawer() {
+    const drawer = document.getElementById('approvalsDrawer');
+    if (drawer) {
+      drawer.classList.add('visible');
+      renderApprovalsList();
+    }
+  }
+
+  function closeApprovalsDrawer() {
+    const drawer = document.getElementById('approvalsDrawer');
+    if (drawer) drawer.classList.remove('visible');
+  }
+
+  function renderApprovalsList() {
+    const container = document.getElementById('approvalsListContainer');
+    if (!container) return;
+
+    const list = window.VenturaDB ? window.VenturaDB.getContractsForCurrentUser() : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: var(--color-text-muted);">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">☕</div>
+          <h4 style="color: #FFF; margin: 0 0 6px 0;">Nenhuma proposta no momento</h4>
+          <p style="font-size: 0.85rem; margin: 0;">Quando os vendedores enviarem propostas no estande, elas aparecerão aqui em tempo real.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    list.forEach(c => {
+      const statusMap = {
+        'pendente': { label: 'Aguardando Aprovação', cls: 'pending' },
+        'aprovado': { label: 'Aprovado', cls: 'approved' },
+        'assinado': { label: 'Assinado pelo Cliente', cls: 'signed' },
+        'rejeitado': { label: 'Ajuste Solicitado', cls: 'rejected' }
+      };
+      const st = statusMap[c.status] || { label: c.status, cls: 'pending' };
+
+      html += `
+        <div class="proposal-card">
+          <div class="proposal-card-header">
+            <div class="proposal-id">
+              <span>🚤</span> ${c.id} • ${c.dados.modeloBarco || 'Embarcação'}
+            </div>
+            <span class="status-badge ${st.cls}">${st.label}</span>
+          </div>
+
+          <div class="proposal-details">
+            <div>
+              <span class="prop-label">Consultor / Estande:</span>
+              <span class="prop-val">${c.vendedorNome}</span>
+            </div>
+            <div>
+              <span class="prop-label">Comprador:</span>
+              <span class="prop-val">${c.dados.nome || 'Não informado'}</span>
+            </div>
+            <div>
+              <span class="prop-label">Motorização:</span>
+              <span class="prop-val">${c.dados.motorizacao || 'Padrão'}</span>
+            </div>
+            <div>
+              <span class="prop-label">Entrada / Sinal:</span>
+              <span class="prop-val">${c.dados.valorSinal || c.dados.valorEntrada || 'R$ 0,00'}</span>
+            </div>
+          </div>
+
+          <div class="proposal-total-row">
+            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Valor Total Negociado:</span>
+            <span class="proposal-total-price">${c.dados.valorTotal || 'R$ 0,00'}</span>
+          </div>
+
+          ${c.status === 'pendente' ? `
+            <div class="proposal-actions">
+              <button type="button" class="btn-approve-action" onclick="approveProposalItem('${c.id}')">
+                ✓ Aprovar Proposta Comercial
+              </button>
+              <button type="button" class="btn-reject-action" onclick="rejectProposalItem('${c.id}')">
+                ✕ Solicitar Ajuste
+              </button>
+            </div>
+          ` : (c.status === 'aprovado' ? `
+            <div style="font-size: 0.82rem; color: #34D399; font-weight: 600;">
+              ✓ Aprovado por ${c.aprovadoPor} • Aguardando vendedor coletar assinatura do cliente.
+            </div>
+          ` : (c.status === 'assinado' ? `
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn-download-signed" onclick="generatePDFFromContractId('${c.id}')">
+                📄 Baixar Contrato Oficial Assinado
+              </button>
+            </div>
+          ` : `
+            <div style="font-size: 0.82rem; color: #F87171;">
+              Motivo do ajuste: ${c.motivoRejeicao || 'Não informado'}
+            </div>
+          `))}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function approveProposalItem(id) {
+    const user = window.VenturaAuth.getCurrentUser();
+    const notes = prompt('Observação da aprovação (opcional):', 'Condição comercial aprovada pela Diretoria');
+    const res = window.VenturaDB.approveProposal(id, user.name, notes);
+    if (res.success) {
+      showToast(res.message);
+    } else {
+      alert(res.message);
+    }
+  }
+
+  function rejectProposalItem(id) {
+    const user = window.VenturaAuth.getCurrentUser();
+    const reason = prompt('Informe o motivo ou o ajuste necessário para o vendedor:');
+    if (!reason) return;
+    const res = window.VenturaDB.rejectProposal(id, user.name, reason);
+    if (res.success) {
+      showToast(res.message);
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // ---- Drawer de Meus Contratos (Vendedor) ----
+  function openMyContractsDrawer() {
+    const drawer = document.getElementById('myContractsDrawer');
+    if (drawer) {
+      drawer.classList.add('visible');
+      renderMyContractsList();
+    }
+  }
+
+  function closeMyContractsDrawer() {
+    const drawer = document.getElementById('myContractsDrawer');
+    if (drawer) drawer.classList.remove('visible');
+  }
+
+  function renderMyContractsList() {
+    const container = document.getElementById('myContractsListContainer');
+    if (!container) return;
+
+    const list = window.VenturaDB ? window.VenturaDB.getContractsForCurrentUser() : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: var(--color-text-muted);">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">📑</div>
+          <h4 style="color: #FFF; margin: 0 0 6px 0;">Você ainda não enviou propostas</h4>
+          <p style="font-size: 0.85rem; margin: 0;">Monte uma embarcação e envie para a aprovação da Diretoria (Carlos Renato, André e Marcos).</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    list.forEach(c => {
+      const statusMap = {
+        'pendente': { label: 'Aguardando Aprovação', cls: 'pending' },
+        'aprovado': { label: 'Aprovado! Coletar Assinatura', cls: 'approved' },
+        'assinado': { label: 'Contrato Assinado', cls: 'signed' },
+        'rejeitado': { label: 'Ajuste Solicitado', cls: 'rejected' }
+      };
+      const st = statusMap[c.status] || { label: c.status, cls: 'pending' };
+
+      html += `
+        <div class="proposal-card">
+          <div class="proposal-card-header">
+            <div class="proposal-id">
+              <span>🚤</span> ${c.id} • ${c.dados.modeloBarco || 'Embarcação'}
+            </div>
+            <span class="status-badge ${st.cls}">${st.label}</span>
+          </div>
+
+          <div class="proposal-details">
+            <div>
+              <span class="prop-label">Comprador:</span>
+              <span class="prop-val">${c.dados.nome || 'Não informado'}</span>
+            </div>
+            <div>
+              <span class="prop-label">Motor:</span>
+              <span class="prop-val">${c.dados.motorizacao || '—'}</span>
+            </div>
+            <div>
+              <span class="prop-label">Prazo de Entrega:</span>
+              <span class="prop-val">${c.dados.prazoEntrega || '—'}</span>
+            </div>
+            <div>
+              <span class="prop-label">Data de Envio:</span>
+              <span class="prop-val">${new Date(c.criadoEm).toLocaleDateString('pt-BR')}</span>
+            </div>
+          </div>
+
+          <div class="proposal-total-row">
+            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Valor Total:</span>
+            <span class="proposal-total-price">${c.dados.valorTotal || 'R$ 0,00'}</span>
+          </div>
+
+          ${c.status === 'aprovado' ? `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 0.82rem; color: #34D399; font-weight: 700;">
+                ✓ Aprovado por ${c.aprovadoPor}! Chame o cliente para assinar:
+              </div>
+              <button type="button" class="btn-sign-now" onclick="startClientSignature('${c.id}')">
+                ✍️ Coletar Assinatura do Cliente
+              </button>
+            </div>
+          ` : (c.status === 'assinado' ? `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button type="button" class="btn-download-signed" onclick="generatePDFFromContractId('${c.id}')">
+                📄 Baixar Contrato Oficial Assinado (PDF)
+              </button>
+            </div>
+          ` : (c.status === 'rejeitado' ? `
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="font-size: 0.78rem; color: #F87171; font-weight: 700; text-transform: uppercase;">Ajuste solicitado por ${c.rejeitadoPor}:</div>
+              <div style="font-size: 0.85rem; color: #FFF; margin-top: 4px;">${c.motivoRejeicao}</div>
+            </div>
+          ` : `
+            <div style="font-size: 0.82rem; color: #FBBF24; font-style: italic;">
+              ⏳ Proposta enviada para Carlos Renato, André e Marcos. Notificaremos assim que aprovada.
+            </div>
+          `))}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function startClientSignature(id) {
+    closeMyContractsDrawer();
+    window.VenturaSignature.openSignatureModal(id);
+  }
+
+  function generatePDFFromContractId(id) {
+    const contract = window.VenturaDB ? window.VenturaDB.getContractById(id) : null;
+    if (!contract) {
+      alert('Contrato não encontrado.');
+      return;
+    }
+    generatePDFFromContract(contract);
+  }
+
+  function generatePDFFromContract(contract) {
+    try {
+      const templateFn = window.VenturaContracts && window.VenturaContracts.nautico;
+      if (!templateFn) {
+        alert('Template náutico não encontrado.');
+        return;
+      }
+
+      const contractData = {
+        ...contract.dados,
+        contratoId: contract.id,
+        evento: contract.evento,
+        vendedorNome: contract.vendedorNome,
+        aprovadoPor: contract.aprovadoPor,
+        aprovadoEm: contract.aprovadoEm,
+        assinaturaCliente: contract.assinaturaCliente
+      };
+
+      const blocks = templateFn(contractData);
+      const filename = `Contrato_Ventura_${contract.dados.modeloBarco || 'Barco'}_${contract.id}.pdf`.replace(/\s+/g, '_');
+
+      window.VenturaPDF.generate(blocks, filename, 'nautico', contract.assinaturaCliente);
+      showToast('📄 Contrato oficial gerado com sucesso!');
+    } catch (e) {
+      console.error('Erro ao gerar PDF do contrato:', e);
+      alert('Erro ao gerar PDF: ' + e.message);
+    }
+  }
+
   // ---- Public VenturaApp API ----
   window.showTab = selectCategory;
   window.selectCategory = selectCategory;
@@ -1090,6 +1565,22 @@
   window.generatePDF = generatePDF;
   window.generatePDFApp = generatePDF;
   window.generateBoletoSchedule = generateBoletoSchedule;
+
+  // Boat Show API Exports
+  window.submitProposalForApproval = submitProposalForApproval;
+  window.createAndDirectApprove = createAndDirectApprove;
+  window.openApprovalsDrawer = openApprovalsDrawer;
+  window.closeApprovalsDrawer = closeApprovalsDrawer;
+  window.openMyContractsDrawer = openMyContractsDrawer;
+  window.closeMyContractsDrawer = closeMyContractsDrawer;
+  window.approveProposalItem = approveProposalItem;
+  window.rejectProposalItem = rejectProposalItem;
+  window.handleLoginClick = handleLoginClick;
+  window.selectLoginUser = selectLoginUser;
+  window.promptNewSeller = promptNewSeller;
+  window.startClientSignature = startClientSignature;
+  window.generatePDFFromContractId = generatePDFFromContractId;
+  window.generatePDFFromContract = generatePDFFromContract;
 
   window.VenturaApp = {
     selectCategory: selectCategory,

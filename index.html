@@ -64,240 +64,61 @@
 
 <div class="app-container">
 
-  <!-- ==================== HEADER ==================== -->
-  <header class="header">
-    <div class="header__badge">
-      <span>🌊 NAVEGAÇÃO, OFF-ROAD & LUXO — DOCUMENTOS OFICIAIS</span>
-    </div>
-    <div class="header__logos">
-      <img src="assets/logo-experience.png" alt="Ventura Experience" class="header__logo-img">
-      <div class="header__logo-divider"></div>
-      <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="header__logo-img">
-    </div>
-    <h1 class="header__brand">Ventura Experience & Marine</h1>
-    <p class="header__subtitle">Sistema de Alta Performance para Geração de Contratos de Compra e Venda</p>
-    <hr class="header__divider">
-  </header>
-
-  <!-- ==================== CATEGORY SELECTOR ==================== -->
-  <section class="category-selector" id="categorySelector">
-
-    <div class="category-card" data-category="atv" id="cardAtv" onclick="showTab('atv')">
-      <span class="category-card__badge"></span>
-      <span class="category-card__icon">🏍️</span>
-      <h2 class="category-card__title">ATV / UTV / BRAT / EVO</h2>
-      <p class="category-card__desc">Quadriciclos, UTVs e veículos off-road</p>
+  <!-- ==================== BOOTH TOPBAR ==================== -->
+  <div class="booth-topbar" id="boothTopbar">
+    <div class="booth-brand-info">
+      <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="booth-logo-mini">
+      <div class="booth-title-group">
+        <h2>⚓ VENTURA MARINE <span class="booth-event-tag">BOAT SHOW 2026</span></h2>
+      </div>
     </div>
 
-    <div class="category-card nautico active" data-category="nautico" id="cardNautico" onclick="showTab('nautico')">
-      <span class="category-card__badge"></span>
-      <span class="category-card__icon">🚤</span>
-      <h2 class="category-card__title">Embarcação Náutica</h2>
-      <p class="category-card__desc">Lanchas e embarcações Ventura Marine</p>
+    <div class="booth-actions">
+      <!-- Crachá do Usuário Logado -->
+      <div class="user-profile-badge" id="userProfileBadge">
+        <div class="user-avatar" id="topbarUserAvatar">CR</div>
+        <div>
+          <div class="user-name-text" id="topbarUserName">Carlos Renato</div>
+          <div class="user-role-label" id="topbarUserRole">Diretoria / Aprovador</div>
+        </div>
+      </div>
+
+      <!-- Botão Fila de Aprovação (Visível para Carlos Renato, André, Marcos) -->
+      <button type="button" class="btn-booth-nav approvals-btn" id="btnOpenApprovals" onclick="openApprovalsDrawer()" style="display: none;">
+        <span>👑 Fila de Aprovações</span>
+        <span class="nav-counter-badge" id="badgeApprovalsCount">0</span>
+      </button>
+
+      <!-- Botão Meus Contratos (Visível para Consultores) -->
+      <button type="button" class="btn-booth-nav" id="btnOpenMyContracts" onclick="openMyContractsDrawer()">
+        <span>📋 Meus Contratos</span>
+        <span class="nav-counter-badge approved-badge" id="badgeMyContractsCount">0</span>
+      </button>
+
+      <!-- Botão Sair / Trocar de Consultor -->
+      <button type="button" class="btn-logout" onclick="VenturaAuth.logout()" title="Trocar de consultor no tablet">
+        🚪 Sair
+      </button>
     </div>
-
-  </section>
-
-  <!-- ==================== FORMULÁRIO ATV/UTV ==================== -->
-  <div class="form-container" id="form-atv" style="display: none;">
-    <form id="formAtv" autocomplete="off">
-
-      <!-- Dados do Comprador -->
-      <div class="form-section">
-        <div class="form-section__header">
-          <div class="form-section__icon">👤</div>
-          <h3 class="form-section__title">Dados do Comprador</h3>
-        </div>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="atv-nome">Nome completo *</label>
-            <input type="text" id="atv-nome" placeholder="Nome completo do comprador">
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-          <div class="form-group">
-            <label for="atv-cpfcnpj">CPF / CNPJ *</label>
-            <input type="text" id="atv-cpfcnpj" data-mask="cpfcnpj" placeholder="000.000.000-00">
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-          <div class="form-group">
-            <label for="atv-rgie">RG / IE</label>
-            <input type="text" id="atv-rgie" placeholder="Documento de identidade">
-          </div>
-          <div class="form-group" style="grid-column: 1 / -1;">
-            <label for="atv-rua">Rua</label>
-            <input type="text" id="atv-rua" placeholder="Rua / Avenida">
-          </div>
-          <div class="form-group">
-            <label for="atv-numero">Nº</label>
-            <input type="text" id="atv-numero" placeholder="Número">
-          </div>
-          <div class="form-group">
-            <label for="atv-bairro">Bairro</label>
-            <input type="text" id="atv-bairro" placeholder="Bairro">
-          </div>
-          <div class="form-group">
-            <label for="atv-complemento">Complemento</label>
-            <input type="text" id="atv-complemento" placeholder="Apto, bloco, etc.">
-          </div>
-          <div class="form-group">
-            <label for="atv-cidade">Cidade</label>
-            <input type="text" id="atv-cidade" placeholder="Cidade">
-          </div>
-          <div class="form-group">
-            <label for="atv-uf">UF</label>
-            <select id="atv-uf">
-              <option value="">Selecione</option>
-              <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
-              <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
-              <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
-              <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
-              <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
-              <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
-              <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
-              <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
-              <option value="SP" selected>SP</option><option value="SE">SE</option><option value="TO">TO</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="atv-cep">CEP</label>
-            <input type="text" id="atv-cep" data-mask="cep" placeholder="00000-000">
-          </div>
-          <div class="form-group">
-            <label for="atv-telefone">Telefone / WhatsApp</label>
-            <input type="text" id="atv-telefone" data-mask="telefone" placeholder="(00) 00000-0000">
-          </div>
-          <div class="form-group">
-            <label for="atv-email">E-mail</label>
-            <input type="email" id="atv-email" placeholder="email@exemplo.com">
-          </div>
-        </div>
-      </div>
-
-      <hr class="section-divider">
-
-      <!-- Dados do Veículo -->
-      <div class="form-section">
-        <div class="form-section__header">
-          <div class="form-section__icon">🏍️</div>
-          <h3 class="form-section__title">Dados do Veículo</h3>
-        </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="atv-tipo">Tipo *</label>
-            <select id="atv-tipo">
-              <option value="">Selecione o tipo</option>
-              <option value="ATV">ATV (Quadriciclo)</option>
-              <option value="UTV">UTV</option>
-              <option value="BRAT">BRAT</option>
-              <option value="EVO GRUNT">EVO GRUNT</option>
-            </select>
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-          <div class="form-group">
-            <label for="atv-marca">Marca</label>
-            <input type="text" id="atv-marca" value="VENTURA" data-prefill="VENTURA" placeholder="Marca">
-          </div>
-          <div class="form-group">
-            <label for="atv-modelo">Modelo *</label>
-            <input type="text" id="atv-modelo" placeholder="Ex: LAND FORCE 650">
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-          <div class="form-group">
-            <label for="atv-cor">Cor</label>
-            <input type="text" id="atv-cor" placeholder="Cor do veículo">
-          </div>
-          <div class="form-group">
-            <label for="atv-chassi">Chassi / Série</label>
-            <input type="text" id="atv-chassi" placeholder="Número do chassi ou série">
-          </div>
-          <div class="form-group">
-            <label for="atv-origem">Origem do veículo</label>
-            <select id="atv-origem">
-              <option value="FÁBRICA">🏭 Vindo da Fábrica</option>
-              <option value="SHOWROOM">🏬 Disponível no Showroom</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label for="atv-itens">Itens inclusos</label>
-            <textarea id="atv-itens" placeholder="TODOS OS ITENS DE SÉRIE (ou detalhe os itens)">TODOS OS ITENS DE SÉRIE</textarea>
-          </div>
-        </div>
-      </div>
-
-      <hr class="section-divider">
-
-      <!-- Dados Financeiros -->
-      <div class="form-section">
-        <div class="form-section__header">
-          <div class="form-section__icon">💰</div>
-          <h3 class="form-section__title">Dados Financeiros e Entrega</h3>
-        </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="atv-valor-total">Valor total *</label>
-            <input type="text" id="atv-valor-total" data-mask="moeda" placeholder="R$ 0,00">
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-          <div class="form-group">
-            <label for="atv-sinal">Sinal / Entrada</label>
-            <input type="text" id="atv-sinal" data-mask="moeda" placeholder="R$ 0,00">
-          </div>
-          <div class="form-group full-width">
-            <label for="atv-saldo">Saldo restante (valor + condições)</label>
-            <input type="text" id="atv-saldo" placeholder="Ex: R$ 65.000,00 em 10x sem juros">
-          </div>
-          <div class="form-group">
-            <label for="atv-prazo">Prazo de entrega (dias úteis)</label>
-            <input type="number" id="atv-prazo" value="15" min="1" placeholder="15">
-          </div>
-          <div class="form-group">
-            <label for="atv-local-entrega">Local de entrega</label>
-            <input type="text" id="atv-local-entrega" value="Ribeirão Preto" data-prefill="Ribeirão Preto" placeholder="Cidade de entrega">
-          </div>
-          <div class="form-group">
-            <label for="atv-responsavel">Responsável pelo transporte</label>
-            <select id="atv-responsavel">
-              <option value="VENDEDORA">VENDEDORA</option>
-              <option value="COMPRADOR">COMPRADOR</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="atv-data">Data do contrato *</label>
-            <input type="text" id="atv-data" data-default="today" placeholder="DD/MM/AAAA">
-            <span class="error-message">Campo obrigatório</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Caixa de Alerta de Validação -->
-      <div class="validation-box" id="valBoxAtv">
-        <div class="validation-box__title">⚠️ Atenção: Preencha os campos obrigatórios para continuar</div>
-        <ul class="validation-box__list" id="valListAtv"></ul>
-        <div class="validation-box__hint">💡 Dica: Você pode usar o botão "⚡ Preencher Exemplo" para preencher dados de teste em 1 clique!</div>
-      </div>
-
-      <!-- Ações -->
-      <div class="actions">
-        <button type="button" class="btn btn-secondary" id="btnQuickFillAtv" onclick="quickFill('atv')" style="border-color: var(--color-accent); color: var(--color-accent-light);">
-          <span class="btn-icon">⚡</span> Preencher Exemplo
-        </button>
-        <button type="button" class="btn btn-secondary" id="btnClearAtv" onclick="clearForm('formAtv')">
-          <span class="btn-icon">🧹</span> Limpar
-        </button>
-        <button type="button" class="btn btn-secondary" id="btnPreviewAtv" onclick="showPreview('atv')">
-          <span class="btn-icon">👁️</span> Pré-visualizar
-        </button>
-        <button type="button" class="btn btn-primary" id="btnGenerateAtv" onclick="generatePDF('atv')">
-          <span class="btn-icon">📄</span> Gerar Contrato PDF
-        </button>
-      </div>
-
-    </form>
   </div>
 
-  <!-- ==================== FORMULÁRIO NÁUTICO ==================== -->
+  <!-- ==================== FORMULÁRIO NÁUTICO BOAT SHOW ==================== -->
   <div class="form-container visible" id="form-nautico" style="display: block;">
     <form id="formNautico" autocomplete="off">
+
+      <!-- Informação do Estande & Consultor Ativo -->
+      <div style="background: rgba(212, 168, 83, 0.08); border: 1px solid rgba(212, 168, 83, 0.3); border-radius: var(--radius-md); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">📋</span>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--color-accent-light); font-weight: 700; text-transform: uppercase;">PROPOSTA OFICIAL DE EVENTO NÁUTICO</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #FFF;">Consultor Responsável: <span id="displayConsultorNome" style="color: var(--color-accent);">—</span></div>
+          </div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--color-text-muted); background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: var(--radius-full); border: 1px solid rgba(255,255,255,0.08);">
+          📍 Estande Ventura Marine — Boat Show 2026
+        </div>
+      </div>
 
       <!-- Dados do Comprador -->
       <div class="form-section">
@@ -567,8 +388,13 @@
         <button type="button" class="btn btn-secondary" id="btnPreviewNautico" onclick="showPreview('nautico')">
           <span class="btn-icon">👁️</span> Pré-visualizar
         </button>
-        <button type="button" class="btn btn-primary" id="btnGenerateNautico" onclick="generatePDF('nautico')">
-          <span class="btn-icon">📄</span> Gerar Contrato PDF
+        <!-- Botão Vendedor: Enviar para Aprovação -->
+        <button type="button" class="btn btn-primary" id="btnSubmitApproval" onclick="submitProposalForApproval()" style="background: linear-gradient(135deg, #D4A853, #92722A); color: #0A1628; font-weight: 800;">
+          <span class="btn-icon">🚀</span> Enviar para Aprovação da Diretoria
+        </button>
+        <!-- Botão Diretoria: Criar e Aprovar Imediatamente -->
+        <button type="button" class="btn btn-primary" id="btnDirectApprove" onclick="createAndDirectApprove()" style="display: none; background: linear-gradient(135deg, #10B981, #059669); color: #FFF; font-weight: 800;">
+          <span class="btn-icon">✓</span> Criar & Aprovar Contrato
         </button>
       </div>
 
@@ -588,20 +414,131 @@
 
   <!-- ==================== FOOTER ==================== -->
   <footer class="footer">
-    <p>Ventura Experience LTDA — Sistema interno de geração de contratos</p>
+    <p>Ventura Marine — Sistema de Alta Performance para Feiras Náuticas | Edição Boat Show 2026</p>
   </footer>
 
+</div>
+
+<!-- ==================== DRAWER: FILA DE APROVAÇÕES (DIRETORIA) ==================== -->
+<div class="drawer-modal" id="approvalsDrawer">
+  <div class="drawer-pane">
+    <div class="drawer-header">
+      <h3><span>👑</span> Fila de Aprovação de Contratos</h3>
+      <button type="button" class="drawer-close-btn" onclick="closeApprovalsDrawer()">✕ Fechar</button>
+    </div>
+    <div class="drawer-body" id="approvalsListContainer">
+      <!-- Lista gerada dinamicamente via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DRAWER: MEUS CONTRATOS (CONSULTOR) ==================== -->
+<div class="drawer-modal" id="myContractsDrawer">
+  <div class="drawer-pane">
+    <div class="drawer-header">
+      <h3><span>📋</span> Minhas Propostas & Contratos</h3>
+      <button type="button" class="drawer-close-btn" onclick="closeMyContractsDrawer()">✕ Fechar</button>
+    </div>
+    <div class="drawer-body" id="myContractsListContainer">
+      <!-- Lista gerada dinamicamente via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: ASSINATURA DIGITAL TOUCHSCREEN ==================== -->
+<div class="sig-modal" id="signatureModal">
+  <div class="sig-box">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+      <div>
+        <div style="font-size: 0.72rem; color: var(--color-accent-light); font-weight: 800; text-transform: uppercase;">ETAPA FINAL • COLETA DE ASSINATURA</div>
+        <h3 id="sigModalContractTitle" style="color: #FFF; margin: 4px 0; font-size: 1.15rem; font-weight: 800;">Contrato Oficial</h3>
+      </div>
+      <button type="button" class="drawer-close-btn" onclick="VenturaSignature.closeSignatureModal()">✕</button>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px;">
+      <span id="sigModalClientName" style="color: #E2E8F0; font-weight: 600;">Cliente: —</span>
+      <span id="sigModalTotalValue" style="color: #60A5FA; font-weight: 800;">Valor: R$ 0,00</span>
+    </div>
+
+    <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0 0 8px 0;">
+      Solicite ao comprador que assine abaixo na tela do tablet com o dedo ou caneta touch:
+    </p>
+
+    <!-- Canvas de Assinatura -->
+    <div class="sig-canvas-wrapper">
+      <canvas id="signatureCanvas"></canvas>
+      <div class="sig-canvas-hint">✍️ Assine dentro deste quadro</div>
+    </div>
+
+    <!-- Ações da Assinatura -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button type="button" class="btn btn-secondary" onclick="VenturaSignature.clearCanvas()" style="padding: 10px 14px; font-size: 0.85rem;">
+        🧹 Limpar
+      </button>
+      <button type="button" class="btn btn-secondary" onclick="VenturaSignature.setPhysicalSignature()" style="padding: 10px 14px; font-size: 0.85rem;" title="Gerar contrato para assinatura física em papel">
+        📝 Assinatura em Papel
+      </button>
+      <button type="button" class="btn-sign-now" onclick="VenturaSignature.confirmSignature()" style="flex: 1;">
+        <span>✓ Confirmar & Emitir Contrato Assinado</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TELA DE LOGIN (OVERLAY) ==================== -->
+<div class="login-overlay" id="loginOverlay" style="display: none;">
+  <div class="login-card">
+    <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="login-logo">
+    <div>
+      <span class="login-badge">⚓ BOAT SHOW EDITION 2026</span>
+    </div>
+    <h1 class="login-title">Acesso ao Estande</h1>
+    <p class="login-subtitle">Selecione seu perfil de consultor ou diretoria para iniciar</p>
+
+    <!-- Seção Aprovadores -->
+    <div class="login-section-label">
+      <span>👑</span> Diretoria & Aprovadores
+    </div>
+    <div class="login-users-grid" id="loginApproversGrid">
+      <!-- Gerado via JS: Carlos Renato, André, Marcos -->
+    </div>
+
+    <!-- Seção Consultores de Venda -->
+    <div class="login-section-label" style="display: flex; justify-content: space-between;">
+      <span><span>💼</span> Consultores de Venda</span>
+      <span onclick="promptNewSeller()" style="font-size: 0.72rem; cursor: pointer; color: var(--color-nautico); text-decoration: underline;">+ Novo Consultor</span>
+    </div>
+    <div class="login-users-grid" id="loginSellersGrid">
+      <!-- Gerado via JS: Consultor 01, 02, 03... -->
+    </div>
+
+    <!-- Campo PIN / Senha -->
+    <div class="login-pin-container">
+      <label for="loginPinInput">Senha / PIN de Acesso:</label>
+      <input type="password" id="loginPinInput" class="login-pin-input" value="1234" maxlength="8" placeholder="••••">
+      <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px; text-align: center;">
+        💡 PIN padrão do estande: <strong>1234</strong>
+      </div>
+    </div>
+
+    <button type="button" class="btn-enter-booth" id="btnDoLogin" onclick="handleLoginClick()">
+      <span>🚀 Acessar Sistema do Estande</span>
+    </button>
+  </div>
 </div>
 
 <!-- ==================== TOAST ==================== -->
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=5.5.0"></script>
-<script src="js/contracts/atv-utv.js?v=5.5.0"></script>
-<script src="js/contracts/nautico.js?v=5.5.0"></script>
-<script src="js/pdf-generator.js?v=5.5.0"></script>
-<script src="js/app.js?v=5.5.0"></script>
+<script src="assets/logos.js?v=6.0.0"></script>
+<script src="js/auth.js?v=6.0.0"></script>
+<script src="js/contracts-db.js?v=6.0.0"></script>
+<script src="js/signature.js?v=6.0.0"></script>
+<script src="js/contracts/nautico.js?v=6.0.0"></script>
+<script src="js/pdf-generator.js?v=6.0.0"></script>
+<script src="js/app.js?v=6.0.0"></script>
 
 </body>
 </html>
