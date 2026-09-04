@@ -1,5 +1,5 @@
 /**
- * Ventura Marine — Edição Boat Show
+ * Ventura Marine — Edição Boat Show 2026
  * Módulo de Autenticação e Perfis (js/auth.js)
  */
 
@@ -14,31 +14,34 @@
     // --- DIRETORIA / APROVADORES ---
     {
       id: 'carlos_renato',
+      username: 'carlos',
       name: 'Carlos Renato',
       role: 'approver',
       roleLabel: 'Diretoria / Aprovador',
       pin: '1234',
-      email: 'carlos.renato@venturamarine.com.br',
+      email: 'carlos@ventura.com.br',
       phone: '(11) 99876-0001',
       avatar: 'CR'
     },
     {
       id: 'andre',
+      username: 'andre',
       name: 'André',
       role: 'approver',
       roleLabel: 'Diretoria / Aprovador',
       pin: '1234',
-      email: 'andre@venturamarine.com.br',
+      email: 'andre@ventura.com.br',
       phone: '(11) 99876-0002',
       avatar: 'AN'
     },
     {
       id: 'marcos',
+      username: 'marcos',
       name: 'Marcos',
       role: 'approver',
       roleLabel: 'Diretoria / Aprovador',
       pin: '1234',
-      email: 'marcos@venturamarine.com.br',
+      email: 'marcos@ventura.com.br',
       phone: '(11) 99876-0003',
       avatar: 'MA'
     },
@@ -46,33 +49,14 @@
     // --- CONSULTORES DE VENDA (ESTANDE) ---
     {
       id: 'consultor_01',
+      username: 'vendas1',
       name: 'Consultor de Vendas 01',
       role: 'seller',
-      roleLabel: 'Consultor de Vendas — Estande A',
+      roleLabel: 'Consultor de Vendas — Estande',
       pin: '1234',
-      email: 'vendas01@venturamarine.com.br',
+      email: 'consultor1@ventura.com.br',
       phone: '(11) 97111-0001',
       avatar: 'V1'
-    },
-    {
-      id: 'consultor_02',
-      name: 'Consultor de Vendas 02',
-      role: 'seller',
-      roleLabel: 'Consultor de Vendas — Estande B',
-      pin: '1234',
-      email: 'vendas02@venturamarine.com.br',
-      phone: '(11) 97111-0002',
-      avatar: 'V2'
-    },
-    {
-      id: 'consultor_03',
-      name: 'Consultor de Vendas 03',
-      role: 'seller',
-      roleLabel: 'Consultor de Vendas — Estande C',
-      pin: '1234',
-      email: 'vendas03@venturamarine.com.br',
-      phone: '(11) 97111-0003',
-      avatar: 'V3'
     }
   ];
 
@@ -104,15 +88,32 @@
     return null;
   }
 
-  function login(userId, pin) {
-    const users = getAllUsers();
-    const user = users.find(u => u.id === userId);
-    if (!user) {
-      return { success: false, message: 'Usuário não encontrado.' };
+  function login(identifier, pin) {
+    if (!identifier || !identifier.trim()) {
+      return { success: false, message: 'Por favor, informe seu e-mail ou usuário.' };
+    }
+    if (!pin || !pin.trim()) {
+      return { success: false, message: 'Por favor, digite sua senha.' };
     }
 
-    if (user.pin && user.pin !== pin) {
-      return { success: false, message: 'Senha / PIN incorreto.' };
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPin = pin.trim();
+    const users = getAllUsers();
+
+    // Busca flexível por e-mail, username ou ID
+    const user = users.find(u => 
+      (u.email && u.email.toLowerCase() === cleanId) ||
+      (u.username && u.username.toLowerCase() === cleanId) ||
+      (u.id && u.id.toLowerCase() === cleanId) ||
+      (u.name && u.name.toLowerCase() === cleanId)
+    );
+
+    if (!user) {
+      return { success: false, message: 'Usuário ou e-mail não encontrado no sistema.' };
+    }
+
+    if (user.pin && user.pin !== cleanPin) {
+      return { success: false, message: 'Senha incorreta. Tente novamente.' };
     }
 
     try {
@@ -143,21 +144,40 @@
     return user && user.role === 'seller';
   }
 
-  function registerNewSeller(name, phone, email, pin) {
+  function registerNewSeller(name, email, phone, pin) {
     if (!name || name.trim() === '') {
-      return { success: false, message: 'Nome é obrigatório.' };
+      return { success: false, message: 'O nome completo é obrigatório.' };
     }
+    if (!email || email.trim() === '') {
+      return { success: false, message: 'O e-mail é obrigatório para login.' };
+    }
+    if (!pin || pin.trim() === '') {
+      return { success: false, message: 'Defina uma senha para o seu acesso.' };
+    }
+
     const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPin = pin.trim();
+
+    // Validar se e-mail já existe
+    const users = getAllUsers();
+    const existing = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+    if (existing) {
+      return { success: false, message: 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.' };
+    }
+
     const id = 'consultor_' + Date.now().toString(36);
     const initials = cleanName.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'V';
+    
     const newUser = {
       id: id,
+      username: cleanEmail.split('@')[0],
       name: cleanName,
       role: 'seller',
       roleLabel: 'Consultor de Vendas — Estande',
-      pin: pin || '1234',
-      email: email || `${id}@venturamarine.com.br`,
-      phone: phone || '',
+      pin: cleanPin,
+      email: cleanEmail,
+      phone: phone ? phone.trim() : '',
       avatar: initials
     };
 
@@ -166,9 +186,48 @@
       let custom = stored ? JSON.parse(stored) : [];
       custom.push(newUser);
       localStorage.setItem(STORAGE_KEY_CUSTOM_USERS, JSON.stringify(custom));
+      
+      // Auto-login do novo consultor
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(newUser));
+      window.dispatchEvent(new CustomEvent('ventura:auth_change', { detail: { user: newUser } }));
+
       return { success: true, user: newUser };
     } catch (e) {
       return { success: false, message: 'Erro ao cadastrar novo consultor.' };
+    }
+  }
+
+  function updateUserPassword(userId, newPin) {
+    if (!newPin || !newPin.trim()) {
+      return { success: false, message: 'A nova senha não pode ser vazia.' };
+    }
+    try {
+      const users = getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return { success: false, message: 'Usuário não encontrado.' };
+
+      user.pin = newPin.trim();
+
+      const stored = localStorage.getItem(STORAGE_KEY_CUSTOM_USERS);
+      let custom = stored ? JSON.parse(stored) : [];
+      const idx = custom.findIndex(u => u.id === userId);
+      if (idx !== -1) {
+        custom[idx] = user;
+      } else {
+        custom.push(user);
+      }
+      localStorage.setItem(STORAGE_KEY_CUSTOM_USERS, JSON.stringify(custom));
+
+      // Atualizar currentUser se for o mesmo
+      const current = getCurrentUser();
+      if (current && current.id === userId) {
+        current.pin = newPin.trim();
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(current));
+      }
+
+      return { success: true, message: 'Senha atualizada com sucesso!' };
+    } catch (e) {
+      return { success: false, message: 'Erro ao salvar nova senha.' };
     }
   }
 
@@ -179,7 +238,8 @@
     logout: logout,
     isApprover: isApprover,
     isSeller: isSeller,
-    registerNewSeller: registerNewSeller
+    registerNewSeller: registerNewSeller,
+    updateUserPassword: updateUserPassword
   };
 
 })();

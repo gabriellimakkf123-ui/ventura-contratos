@@ -1170,66 +1170,108 @@
 
   function renderLoginUsers() {
     const users = window.VenturaAuth ? window.VenturaAuth.getAllUsers() : [];
-    const approversGrid = document.getElementById('loginApproversGrid');
-    const sellersGrid = document.getElementById('loginSellersGrid');
+    const quickChipsGrid = document.getElementById('quickChipsGrid');
 
-    if (!approversGrid || !sellersGrid) return;
+    if (!quickChipsGrid) return;
 
-    approversGrid.innerHTML = '';
-    sellersGrid.innerHTML = '';
+    quickChipsGrid.innerHTML = '';
 
     users.forEach(u => {
-      const isActive = u.id === selectedLoginUserId;
-      const activeClass = isActive ? 'active' : '';
       const avatarClass = u.role === 'approver' ? 'approver' : '';
-      const btn = document.createElement('div');
-      btn.className = `login-user-btn ${activeClass}`;
-      btn.onclick = function() { selectLoginUser(u.id); };
-      btn.innerHTML = `
-        <div class="user-avatar ${avatarClass}">${u.avatar || u.name.slice(0, 2).toUpperCase()}</div>
+      const chip = document.createElement('div');
+      chip.className = 'quick-chip';
+      chip.title = `Entrar como ${u.name} (${u.email})`;
+      chip.onclick = function() { fillQuickUser(u.email || u.username, u.pin || '1234'); };
+      chip.innerHTML = `
+        <div class="quick-chip-avatar ${avatarClass}">${u.avatar || u.name.slice(0, 2).toUpperCase()}</div>
         <span>${u.name}</span>
-        <small>${u.role === 'approver' ? 'Diretoria' : 'Consultor'}</small>
       `;
-
-      if (u.role === 'approver') {
-        approversGrid.appendChild(btn);
-      } else {
-        sellersGrid.appendChild(btn);
-      }
+      quickChipsGrid.appendChild(chip);
     });
   }
 
-  function selectLoginUser(userId) {
-    selectedLoginUserId = userId;
-    renderLoginUsers();
+  function fillQuickUser(identifier, pin) {
+    const emailInput = document.getElementById('loginEmailInput');
+    const pinInput = document.getElementById('loginPasswordInput');
+    if (emailInput) emailInput.value = identifier;
+    if (pinInput) pinInput.value = pin;
+    if (window.showToast) {
+      showToast(`Usuário selecionado. Clique em Entrar no Sistema!`);
+    }
   }
 
-  function handleLoginClick() {
-    const pinInput = document.getElementById('loginPinInput');
-    const pin = pinInput ? pinInput.value.trim() : '1234';
+  function switchLoginTab(tab) {
+    const paneSignIn = document.getElementById('loginSignInPane');
+    const paneSignUp = document.getElementById('loginSignUpPane');
+    const btnSignIn = document.getElementById('tabLoginSignIn');
+    const btnSignUp = document.getElementById('tabLoginSignUp');
 
-    if (!selectedLoginUserId) {
-      alert('Selecione um usuário para continuar.');
+    if (tab === 'signup') {
+      if (paneSignIn) paneSignIn.style.display = 'none';
+      if (paneSignUp) paneSignUp.style.display = 'block';
+      if (btnSignIn) btnSignIn.classList.remove('active');
+      if (btnSignUp) btnSignUp.classList.add('active');
+    } else {
+      if (paneSignIn) paneSignIn.style.display = 'block';
+      if (paneSignUp) paneSignUp.style.display = 'none';
+      if (btnSignIn) btnSignIn.classList.add('active');
+      if (btnSignUp) btnSignUp.classList.remove('active');
+    }
+  }
+
+  function handleEmailLoginClick() {
+    const emailInput = document.getElementById('loginEmailInput');
+    const passInput = document.getElementById('loginPasswordInput');
+
+    const identifier = emailInput ? emailInput.value.trim() : '';
+    const pin = passInput ? passInput.value.trim() : '';
+
+    if (!identifier) {
+      alert('Por favor, informe seu e-mail ou usuário.');
+      if (emailInput) emailInput.focus();
       return;
     }
 
-    const res = window.VenturaAuth.login(selectedLoginUserId, pin);
+    const res = window.VenturaAuth.login(identifier, pin);
     if (res.success) {
-      showToast(`Bem-vindo ao estande, ${res.user.name}!`);
+      showToast(`Bem-vindo, ${res.user.name}!`);
       updateAuthUI();
     } else {
       alert(res.message || 'Erro ao realizar login.');
     }
   }
 
-  function promptNewSeller() {
-    const name = prompt('Nome do novo consultor de vendas:');
-    if (!name || !name.trim()) return;
-    const phone = prompt('Telefone / WhatsApp do consultor:');
-    const res = window.VenturaAuth.registerNewSeller(name, phone, '', '1234');
+  function handleRegisterSellerClick() {
+    const nameInput = document.getElementById('regNameInput');
+    const emailInput = document.getElementById('regEmailInput');
+    const phoneInput = document.getElementById('regPhoneInput');
+    const passInput = document.getElementById('regPasswordInput');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const pass = passInput ? passInput.value.trim() : '';
+
+    if (!name) {
+      alert('Informe o seu nome completo.');
+      if (nameInput) nameInput.focus();
+      return;
+    }
+    if (!email) {
+      alert('Informe o seu e-mail profissional.');
+      if (emailInput) emailInput.focus();
+      return;
+    }
+    if (!pass) {
+      alert('Crie uma senha de acesso.');
+      if (passInput) passInput.focus();
+      return;
+    }
+
+    const res = window.VenturaAuth.registerNewSeller(name, email, phone, pass);
     if (res.success) {
-      showToast(`Consultor ${name} cadastrado com sucesso!`);
-      selectedLoginUserId = res.user.id;
+      showToast(`Consultor ${res.user.name} cadastrado com sucesso!`);
+      updateAuthUI();
       renderLoginUsers();
     } else {
       alert(res.message);
@@ -1575,9 +1617,13 @@
   window.closeMyContractsDrawer = closeMyContractsDrawer;
   window.approveProposalItem = approveProposalItem;
   window.rejectProposalItem = rejectProposalItem;
-  window.handleLoginClick = handleLoginClick;
-  window.selectLoginUser = selectLoginUser;
-  window.promptNewSeller = promptNewSeller;
+  window.handleLoginClick = handleEmailLoginClick;
+  window.handleEmailLoginClick = handleEmailLoginClick;
+  window.handleRegisterSellerClick = handleRegisterSellerClick;
+  window.switchLoginTab = switchLoginTab;
+  window.fillQuickUser = fillQuickUser;
+  window.selectLoginUser = fillQuickUser;
+  window.promptNewSeller = handleRegisterSellerClick;
   window.startClientSignature = startClientSignature;
   window.generatePDFFromContractId = generatePDFFromContractId;
   window.generatePDFFromContract = generatePDFFromContract;

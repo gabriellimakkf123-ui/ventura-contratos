@@ -486,45 +486,82 @@
   </div>
 </div>
 
-<!-- ==================== TELA DE LOGIN (OVERLAY) ==================== -->
+<!-- ==================== TELA DE LOGIN (OVERLAY NÁUTICO) ==================== -->
 <div class="login-overlay" id="loginOverlay" style="display: none;">
   <div class="login-card">
-    <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="login-logo">
+    
+    <!-- Logo Ventura Marine em container branco nítido, sem cortes -->
+    <div class="login-logo-container">
+      <img src="assets/logo-marine-clean.png" alt="Ventura Marine" class="login-logo">
+    </div>
+
     <div>
-      <span class="login-badge">⚓ BOAT SHOW EDITION 2026</span>
+      <span class="login-badge">⚓ BOAT SHOW 2026</span>
     </div>
-    <h1 class="login-title">Acesso ao Estande</h1>
-    <p class="login-subtitle">Selecione seu perfil de consultor ou diretoria para iniciar</p>
+    <h1 class="login-title">Acesso ao Sistema</h1>
+    <p class="login-subtitle">Sistema Oficial de Contratos & Vendas Náuticas</p>
 
-    <!-- Seção Aprovadores -->
-    <div class="login-section-label">
-      <span>👑</span> Diretoria & Aprovadores
-    </div>
-    <div class="login-users-grid" id="loginApproversGrid">
-      <!-- Gerado via JS: Carlos Renato, André, Marcos -->
+    <!-- Alternador de Abas: Entrar / Criar Acesso -->
+    <div class="login-tabs">
+      <button type="button" class="login-tab-btn active" id="tabLoginSignIn" onclick="switchLoginTab('signin')">Entrar</button>
+      <button type="button" class="login-tab-btn" id="tabLoginSignUp" onclick="switchLoginTab('signup')">Criar Acesso / Novo Consultor</button>
     </div>
 
-    <!-- Seção Consultores de Venda -->
-    <div class="login-section-label" style="display: flex; justify-content: space-between;">
-      <span><span>💼</span> Consultores de Venda</span>
-      <span onclick="promptNewSeller()" style="font-size: 0.72rem; cursor: pointer; color: var(--color-nautico); text-decoration: underline;">+ Novo Consultor</span>
-    </div>
-    <div class="login-users-grid" id="loginSellersGrid">
-      <!-- Gerado via JS: Consultor 01, 02, 03... -->
-    </div>
+    <!-- Painel: Entrar -->
+    <div id="loginSignInPane" class="login-pane active">
+      <div class="form-group-login">
+        <label for="loginEmailInput">E-mail ou Usuário:</label>
+        <input type="text" id="loginEmailInput" class="login-input" placeholder="Ex: carlos@ventura.com.br ou carlos" autocomplete="username">
+      </div>
 
-    <!-- Campo PIN / Senha -->
-    <div class="login-pin-container">
-      <label for="loginPinInput">Senha / PIN de Acesso:</label>
-      <input type="password" id="loginPinInput" class="login-pin-input" value="1234" maxlength="8" placeholder="••••">
-      <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px; text-align: center;">
-        💡 PIN padrão do estande: <strong>1234</strong>
+      <div class="form-group-login">
+        <label for="loginPasswordInput">Senha:</label>
+        <input type="password" id="loginPasswordInput" class="login-input" value="1234" placeholder="••••" autocomplete="current-password">
+      </div>
+
+      <button type="button" class="btn-enter-booth" id="btnDoLogin" onclick="handleEmailLoginClick()">
+        <span>🚀 Entrar no Sistema</span>
+      </button>
+
+      <!-- Acesso Rápido Discreto para o Estande / Demonstração -->
+      <div class="quick-access-box">
+        <div class="quick-access-title">Ou selecione seu usuário para preenchimento rápido:</div>
+        <div class="quick-chips-grid" id="quickChipsGrid">
+          <!-- Gerado via JS: Carlos Renato, André, Marcos, Consultores -->
+        </div>
       </div>
     </div>
 
-    <button type="button" class="btn-enter-booth" id="btnDoLogin" onclick="handleLoginClick()">
-      <span>🚀 Acessar Sistema do Estande</span>
-    </button>
+    <!-- Painel: Criar Acesso / Novo Consultor -->
+    <div id="loginSignUpPane" class="login-pane" style="display: none;">
+      <div class="form-group-login">
+        <label for="regNameInput">Nome Completo *</label>
+        <input type="text" id="regNameInput" class="login-input" placeholder="Seu nome completo">
+      </div>
+      <div class="form-group-login">
+        <label for="regEmailInput">E-mail Profissional *</label>
+        <input type="email" id="regEmailInput" class="login-input" placeholder="seu-email@ventura.com.br">
+      </div>
+      <div class="form-group-login">
+        <label for="regPhoneInput">Telefone / WhatsApp</label>
+        <input type="text" id="regPhoneInput" class="login-input" placeholder="(00) 00000-0000" data-mask="telefone">
+      </div>
+      <div class="form-group-login">
+        <label for="regPasswordInput">Crie sua Senha de Acesso *</label>
+        <input type="password" id="regPasswordInput" class="login-input" placeholder="Digite uma senha">
+      </div>
+
+      <button type="button" class="btn-enter-booth" onclick="handleRegisterSellerClick()">
+        <span>✓ Cadastrar e Acessar Sistema</span>
+      </button>
+
+      <div style="margin-top: 14px; text-align: center;">
+        <a href="javascript:void(0)" onclick="switchLoginTab('signin')" style="color: var(--color-accent-light); font-size: 0.82rem; text-decoration: underline;">
+          ← Já possui acesso? Voltar para Entrar
+        </a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -532,13 +569,13 @@
 <div class="toast" id="toast"></div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="assets/logos.js?v=6.0.0"></script>
-<script src="js/auth.js?v=6.0.0"></script>
-<script src="js/contracts-db.js?v=6.0.0"></script>
-<script src="js/signature.js?v=6.0.0"></script>
-<script src="js/contracts/nautico.js?v=6.0.0"></script>
-<script src="js/pdf-generator.js?v=6.0.0"></script>
-<script src="js/app.js?v=6.0.0"></script>
+<script src="assets/logos.js?v=6.1.0"></script>
+<script src="js/auth.js?v=6.1.0"></script>
+<script src="js/contracts-db.js?v=6.1.0"></script>
+<script src="js/signature.js?v=6.1.0"></script>
+<script src="js/contracts/nautico.js?v=6.1.0"></script>
+<script src="js/pdf-generator.js?v=6.1.0"></script>
+<script src="js/app.js?v=6.1.0"></script>
 
 </body>
 </html>
