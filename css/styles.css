@@ -1933,3 +1933,34 @@ body::before {
   user-select: none;
 }
 
+/* ---- Modal: Configurações de Acesso (Minha Conta) ---- */
+#accountSettingsModal {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(4, 10, 20, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  z-index: 99999 !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+}
+
+#accountSettingsModal.visible {
+  display: flex !important;
+}
+
+.settings-modal-box {
+  width: 100% !important;
+  max-width: 520px !important;
+  background: #0D1C30 !important;
+  border: 1.5px solid rgba(212, 168, 83, 0.45) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 28px 26px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(212, 168, 83, 0.15) !important;
+  animation: modalFadeIn 0.25s ease-out;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+

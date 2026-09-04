@@ -1114,6 +1114,25 @@
       }
     });
 
+    // Event listener explícito para o botão Configurar Acesso
+    const btnSettings = document.getElementById('btnOpenAccountSettings');
+    if (btnSettings) {
+      btnSettings.addEventListener('click', function(e) {
+        e.preventDefault();
+        openAccountSettingsModal();
+      });
+    }
+
+    // Fechar modal ao clicar fora da caixa
+    const modalSettings = document.getElementById('accountSettingsModal');
+    if (modalSettings) {
+      modalSettings.addEventListener('click', function(e) {
+        if (e.target === modalSettings) {
+          closeAccountSettingsModal();
+        }
+      });
+    }
+
     updateCounters();
   }
 
@@ -1528,9 +1547,17 @@
   // ---- Modal de Configurações da Conta ----
   function openAccountSettingsModal() {
     const user = window.VenturaAuth ? window.VenturaAuth.getCurrentUser() : null;
-    if (!user) return;
+    if (!user) {
+      showToast('⚠️ Faça login para configurar seu acesso.', 'error');
+      return;
+    }
 
     const modal = document.getElementById('accountSettingsModal');
+    if (!modal) {
+      console.error('Elemento accountSettingsModal não encontrado no DOM!');
+      return;
+    }
+
     const nameDisp = document.getElementById('settingsUserNameDisplay');
     const roleDisp = document.getElementById('settingsUserRoleDisplay');
     const emailInput = document.getElementById('settingsEmailInput');
@@ -1538,17 +1565,21 @@
     const phoneInput = document.getElementById('settingsPhoneInput');
 
     if (nameDisp) nameDisp.textContent = user.name;
-    if (roleDisp) roleDisp.textContent = user.roleLabel;
-    if (emailInput) emailInput.value = user.email || '';
+    if (roleDisp) roleDisp.textContent = user.roleLabel || user.role;
+    if (emailInput) emailInput.value = user.email || user.username || '';
     if (passInput) passInput.value = user.pin || '';
     if (phoneInput) phoneInput.value = user.phone || '';
 
-    if (modal) modal.style.display = 'flex';
+    modal.classList.add('visible');
+    modal.style.display = 'flex';
   }
 
   function closeAccountSettingsModal() {
     const modal = document.getElementById('accountSettingsModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('visible');
+      modal.style.display = 'none';
+    }
   }
 
   function saveAccountSettings() {
